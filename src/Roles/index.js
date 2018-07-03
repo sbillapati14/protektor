@@ -1,4 +1,4 @@
-const requiredParam = require('../utils/requiredParam');
+const { requiredParam, getResourceName } = require('../utils');
 
 module.exports = function createRoles() {
   const roles = [];
@@ -8,6 +8,7 @@ module.exports = function createRoles() {
     resource = requiredParam('resource'),
     roleName = requiredParam('roleName')
   }) {
+    const resourceName = getResourceName(resource);
     let role = roles.find(aRole => aRole.name === roleName);
     if (!role) {
       role = {
@@ -18,7 +19,7 @@ module.exports = function createRoles() {
     }
 
     let permission = role.permissions.find(
-      aPermission => aPermission.action === action && aPermission.resource === resource
+      aPermission => aPermission.action === action && aPermission.resource === resourceName
     );
     if (!permission) {
       permission = {
@@ -29,7 +30,7 @@ module.exports = function createRoles() {
       role.permissions.push(permission);
     }
     permission.action = action;
-    permission.resource = resource;
+    permission.resource = resourceName;
   }
 
   function forbid() {}
