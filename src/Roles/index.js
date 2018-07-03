@@ -8,7 +8,7 @@ module.exports = function createRoles() {
     resource = requiredParam('resource'),
     roleName = requiredParam('roleName')
   }) {
-    let role = roles.find(aRole => aRole.name);
+    let role = roles.find(aRole => aRole.name === roleName);
     if (!role) {
       role = {
         name: roleName,
@@ -23,7 +23,8 @@ module.exports = function createRoles() {
     if (!permission) {
       permission = {
         action: '',
-        resource: ''
+        resource: '',
+        isDisallowing: false
       };
       role.permissions.push(permission);
     }
@@ -43,7 +44,9 @@ module.exports = function createRoles() {
 
   function fromJSON() {}
 
-  function toJSON() {}
+  function toJSON() {
+    return roles;
+  }
 
   return Object.freeze({
     allow,
