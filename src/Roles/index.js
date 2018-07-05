@@ -58,7 +58,11 @@ module.exports = function createRoles() {
     });
   }
 
-  function hasPermissions(action, resource, roleName) {
+  function hasPermissions({
+    action = requiredParam('action'),
+    resource = requiredParam('resource'),
+    roleName = requiredParam('roleName')
+  }) {
     if (roleName === 'root') {
       // root can do anything
       return true;
