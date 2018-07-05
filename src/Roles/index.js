@@ -64,6 +64,8 @@ module.exports = function createRoles() {
 
   function rolesByName() {}
 
+  function allRoles() {}
+
   function removeRole() {}
 
   function fromJSON() {}
@@ -78,6 +80,7 @@ module.exports = function createRoles() {
     hasPermissions,
     removePermission,
     rolesByName,
+    allRoles,
     removeRole,
     fromJSON,
     toJSON
