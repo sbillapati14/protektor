@@ -90,7 +90,9 @@ module.exports = function createRoles() {
 
   function rolesByName() {}
 
-  function allRoles() {}
+  function allRoles() {
+    return roles.map(aRole => aRole.name);
+  }
 
   function removeRole() {}
 

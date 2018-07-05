@@ -182,4 +182,9 @@ describe('Roles', () => {
   it('check permissions for reasource without defined permissions - should be denied', () => {
     expect(Roles.hasPermissions('modify', 'Articles', 'dev3')).toBe(false);
   });
+
+  it('return all role names - should get list of all of the roles', () => {
+    const allRoles = Roles.allRoles();
+    expect(allRoles).toEqual(['admin', 'dev', 'dev1', 'dev2', 'dev3']);
+  });
 });
