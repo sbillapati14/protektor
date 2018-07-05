@@ -1,4 +1,5 @@
 const { requiredParam, getResourceName } = require('../utils');
+const { RoleNotFoundError, PermissionNotFoundError } = require('../Errors');
 
 module.exports = function createRoles() {
   const roles = [];
@@ -90,7 +91,26 @@ module.exports = function createRoles() {
     return false;
   }
 
-  function removePermission() {}
+  function removePermission({
+    action = requiredParam('action'),
+    resource = requiredParam('resource'),
+    roleName = requiredParam('roleName')
+  }) {
+    const requestedRole = roles.find(aRole => aRole.name === roleName);
+    if (!requestedRole) {
+      throw new RoleNotFoundError(roleName);
+    }
+
+    const requestedPermissionIndex = requestedRole.permissions.findIndex(
+      aPerm => aPerm.action === action && aPerm.resource === resource
+    );
+
+    if (requestedPermissionIndex === -1) {
+      throw new PermissionNotFoundError(action, resource);
+    }
+
+    requestedRole.permissions.splice(requestedPermissionIndex, 1);
+  }
 
   function rolesByName(roleName) {
     return roles.find(aRole => aRole.name === roleName);
@@ -100,7 +120,14 @@ module.exports = function createRoles() {
     return roles.map(aRole => aRole.name);
   }
 
-  function removeRole() {}
+  function removeRole(roleName) {
+    const roleIndex = roles.findIndex(aRole => aRole.name === roleName);
+    if (roleIndex === -1) {
+      throw new RoleNotFoundError(roleName);
+    }
+
+    roles.splice(roleIndex, 1);
+  }
 
   function fromJSON() {}
 

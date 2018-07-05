@@ -1,5 +1,9 @@
-const InvalidResourceTypeError = require('./invalidResourceTypeError');
+const InvalidResourceTypeError = require('./InvalidResourceTypeError');
+const RoleNotFoundError = require('./RoleNotFoundError');
+const PermissionNotFoundError = require('./PermissionNotFoundError');
 
 module.exports = {
-  InvalidResourceTypeError
+  InvalidResourceTypeError,
+  RoleNotFoundError,
+  PermissionNotFoundError
 };

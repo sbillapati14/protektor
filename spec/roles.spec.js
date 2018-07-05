@@ -1,5 +1,9 @@
 import { Roles } from '../src';
-import { InvalidResourceTypeError } from '../src/Errors';
+import {
+  InvalidResourceTypeError,
+  RoleNotFoundError,
+  PermissionNotFoundError
+} from '../src/Errors';
 
 describe('Roles', () => {
   it('create allow permissions - new role should be created', () => {
@@ -214,5 +218,37 @@ describe('Roles', () => {
       ]
     };
     expect(role).toEqual(expectedRole);
+  });
+
+  it('remove permission - permission should be removed', () => {
+    Roles.removePermission({ action: 'read', resource: 'view2', roleName: 'admin' });
+    const role = Roles.rolesByName('admin');
+    const expectedRole = {
+      name: 'admin',
+      permissions: [
+        { action: 'read', resource: 'view1', isDisallowing: true },
+        { action: 'read', resource: 'view4', isDisallowing: false },
+        { action: 'write', resource: 'view4', isDisallowing: false }
+      ]
+    };
+    expect(role).toEqual(expectedRole);
+  });
+
+  it('remove permission from role that does not exist - should throw error', () => {
+    expect(() => Roles.removePermission({ action: 'read', resource: 'view2', roleName: 'adminster' })).toThrow('Role adminster not found');
+  });
+
+  it('remove permission from role that does not have that permission - should thorw error', () => {
+    expect(() => Roles.removePermission({ action: 'modify', resource: 'view2', roleName: 'admin' })).toThrow('Permission action: modify resource: view2 not found');
+  });
+
+  it('remove admin role', () => {
+    Roles.removeRole('admin');
+    const allRoles = Roles.allRoles();
+    expect(allRoles).toEqual(['dev', 'dev1', 'dev2', 'dev3']);
+  });
+
+  it('remove role that does not exist - should throw error', () => {
+    expect(() => Roles.removeRole('notthere')).toThrow('Role notthere not found');
   });
 });
