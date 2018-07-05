@@ -58,7 +58,33 @@ module.exports = function createRoles() {
     });
   }
 
-  function hasPermissions() {}
+  function hasPermissions(action, resource, roleName) {
+    if (roleName === 'root') {
+      // root can do anything
+      return true;
+    }
+
+    const role = roles.find(aRole => aRole.name === roleName);
+    if (!role) {
+      // role does not exist so deny access
+      return false;
+    }
+
+    const permission = role.permissions.find(
+      aPermission => aPermission.action === action && aPermission.resource === resource
+    );
+    if (!permission) {
+      // role has no permissions for this action or role
+      return false;
+    }
+
+    if (!permission.isDisallowing) {
+      // role has permission for this action on this resource
+      return true;
+    }
+
+    return false;
+  }
 
   function removePermission() {}
 

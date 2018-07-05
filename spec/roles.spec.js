@@ -80,8 +80,10 @@ describe('Roles', () => {
     const roleModel = Roles.toJSON();
     const expectedPermission = {
       name: 'admin',
-      permissions: [{ action: 'read', resource: 'view1', isDisallowing: true },
-      { action: 'read', resource: 'view2', isDisallowing: false }]
+      permissions: [
+        { action: 'read', resource: 'view1', isDisallowing: true },
+        { action: 'read', resource: 'view2', isDisallowing: false }
+      ]
     };
     expect(roleModel).toContainEqual(expectedPermission);
   });
@@ -147,5 +149,37 @@ describe('Roles', () => {
     expect(() => Roles.forbid({ action: 'read', resource: wrong, roleName: 'dev3' })).toThrow(
       'resource'
     );
+  });
+
+  it('check root permissions', () => {
+    expect(Roles.hasPermissions('read', 'Posts', 'root')).toBe(true);
+  });
+
+  it('check role permissions with multiple permissions - admin should be allowed to read write view 4', () => {
+    Roles.allow({ action: 'read', resource: 'view4', roleName: 'admin' });
+    Roles.allow({ action: 'write', resource: 'view4', roleName: 'admin' });
+    const roleModel = Roles.toJSON();
+    const expectedPermission = {
+      name: 'admin',
+      permissions: [
+        { action: 'read', isDisallowing: true, resource: 'view1' },
+        { action: 'read', isDisallowing: true, resource: 'view2' },
+        { action: 'read', isDisallowing: false, resource: 'view4' },
+        { action: 'write', isDisallowing: false, resource: 'view4' }
+      ]
+    };
+    expect(roleModel).toContainEqual(expectedPermission);
+    expect(Roles.hasPermissions('read', 'view4', 'admin')).toBe(true);
+    expect(Roles.hasPermissions('write', 'view4', 'admin')).toBe(true);
+    expect(Roles.hasPermissions('write', 'view2', 'admin')).toBe(false);
+    expect(Roles.hasPermissions('read', 'view2', 'admin')).toBe(false);
+  });
+
+  it('check role permissions with single permission - dev3 should not have read access to goofy function', () => {
+    expect(Roles.hasPermissions('read', 'goofy', 'dev3')).toBe(false);
+  });
+
+  it('check permissions for reasource without defined permissions - should be denied', () => {
+    expect(Roles.hasPermissions('modify', 'Articles', 'dev3')).toBe(false);
   });
 });
