@@ -187,4 +187,18 @@ describe('Roles', () => {
     const allRoles = Roles.allRoles();
     expect(allRoles).toEqual(['admin', 'dev', 'dev1', 'dev2', 'dev3']);
   });
+
+  it('find specific role - should return role with its permissions', () => {
+    const role = Roles.rolesByName('admin');
+    const expectedRole = {
+      name: 'admin',
+      permissions: [
+        { action: 'read', resource: 'view1', isDisallowing: true },
+        { action: 'read', resource: 'view2', isDisallowing: true },
+        { action: 'read', resource: 'view4', isDisallowing: false },
+        { action: 'write', resource: 'view4', isDisallowing: false }
+      ]
+    };
+    expect(role).toEqual(expectedRole);
+  });
 });

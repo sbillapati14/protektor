@@ -88,7 +88,9 @@ module.exports = function createRoles() {
 
   function removePermission() {}
 
-  function rolesByName() {}
+  function rolesByName(roleName) {
+    return roles.find(aRole => aRole.name === roleName);
+  }
 
   function allRoles() {
     return roles.map(aRole => aRole.name);
