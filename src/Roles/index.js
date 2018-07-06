@@ -1,5 +1,9 @@
 const { requiredParam, getResourceName } = require('../utils');
-const { RoleNotFoundError, PermissionNotFoundError } = require('../Errors');
+const {
+  RoleNotFoundError,
+  PermissionNotFoundError,
+  InvalidPayloadTypeError
+} = require('../Errors');
 
 module.exports = function createRoles() {
   const roles = [];
@@ -113,7 +117,8 @@ module.exports = function createRoles() {
   }
 
   function rolesByName(roleName) {
-    return roles.find(aRole => aRole.name === roleName);
+    const foundRole = roles.find(aRole => aRole.name === roleName);
+    return { ...foundRole };
   }
 
   function allRoles() {
@@ -129,10 +134,44 @@ module.exports = function createRoles() {
     roles.splice(roleIndex, 1);
   }
 
-  function fromJSON() {}
+  function fromJSON(data) {
+    roles.length = 0;
+
+    if (!data || !Array.isArray(data)) {
+      throw new InvalidPayloadTypeError('Invalid role payload');
+    }
+
+    data.forEach((role) => {
+      if (!role.name) {
+        throw new InvalidPayloadTypeError('Invalid role name');
+      }
+
+      if (!role.permissions || !Array.isArray(role.permissions)) {
+        throw new InvalidPayloadTypeError(`Invalid permissions type for role: ${role.name}`);
+      }
+
+      role.permissions.forEach((perm) => {
+        if (
+          !perm.action
+          || !perm.resource
+          || !perm.isDisallowing === undefined
+          || !perm.isDisallowing === null
+        ) {
+          throw new InvalidPayloadTypeError(`Invalid permission payload for role ${role.name}`);
+        }
+
+        createPermission({
+          action: perm.action,
+          resource: perm.resource,
+          roleName: role.name,
+          isDisallowing: perm.isDisallowing
+        });
+      });
+    });
+  }
 
   function toJSON() {
-    return roles;
+    return [...roles];
   }
 
   return Object.freeze({

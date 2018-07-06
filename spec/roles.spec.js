@@ -52,7 +52,11 @@ describe('Roles', () => {
 
   it('create allow permission with instance of the class type - should add name of class as resource', () => {
     class SomeObject {}
-    Roles.allow({ action: 'read', resource: new SomeObject(), roleName: 'dev2' });
+    Roles.allow({
+      action: 'read',
+      resource: new SomeObject(),
+      roleName: 'dev2'
+    });
     const roleModel = Roles.toJSON();
     const expectedPermission = {
       name: 'dev2',
@@ -128,7 +132,11 @@ describe('Roles', () => {
 
   it('create forbid permission with instance of the class type - should add name of class as resource', () => {
     class SomeObject {}
-    Roles.forbid({ action: 'read', resource: new SomeObject(), roleName: 'dev2' });
+    Roles.forbid({
+      action: 'read',
+      resource: new SomeObject(),
+      roleName: 'dev2'
+    });
     const roleModel = Roles.toJSON();
     const expectedPermission = {
       name: 'dev2',
@@ -156,9 +164,13 @@ describe('Roles', () => {
   });
 
   it('check root permissions', () => {
-    expect(Roles.hasPermissions({ action: 'read', resource: 'Posts', roleName: 'root' })).toBe(
-      true
-    );
+    expect(
+      Roles.hasPermissions({
+        action: 'read',
+        resource: 'Posts',
+        roleName: 'root'
+      })
+    ).toBe(true);
   });
 
   it('check role permissions with multiple permissions - admin should be allowed to read write view 4', () => {
@@ -175,30 +187,54 @@ describe('Roles', () => {
       ]
     };
     expect(roleModel).toContainEqual(expectedPermission);
-    expect(Roles.hasPermissions({ action: 'read', resource: 'view4', roleName: 'admin' })).toBe(
-      true
-    );
-    expect(Roles.hasPermissions({ action: 'write', resource: 'view4', roleName: 'admin' })).toBe(
-      true
-    );
-    expect(Roles.hasPermissions({ action: 'write', resource: 'view2', roleName: 'admin' })).toBe(
-      false
-    );
-    expect(Roles.hasPermissions({ action: 'read', resource: 'view2', roleName: 'admin' })).toBe(
-      false
-    );
+    expect(
+      Roles.hasPermissions({
+        action: 'read',
+        resource: 'view4',
+        roleName: 'admin'
+      })
+    ).toBe(true);
+    expect(
+      Roles.hasPermissions({
+        action: 'write',
+        resource: 'view4',
+        roleName: 'admin'
+      })
+    ).toBe(true);
+    expect(
+      Roles.hasPermissions({
+        action: 'write',
+        resource: 'view2',
+        roleName: 'admin'
+      })
+    ).toBe(false);
+    expect(
+      Roles.hasPermissions({
+        action: 'read',
+        resource: 'view2',
+        roleName: 'admin'
+      })
+    ).toBe(false);
   });
 
   it('check role permissions with single permission - dev3 should not have read access to goofy function', () => {
-    expect(Roles.hasPermissions({ action: 'read', resource: 'goofy', roleName: 'dev3' })).toBe(
-      false
-    );
+    expect(
+      Roles.hasPermissions({
+        action: 'read',
+        resource: 'goofy',
+        roleName: 'dev3'
+      })
+    ).toBe(false);
   });
 
   it('check permissions for reasource without defined permissions - should be denied', () => {
-    expect(Roles.hasPermissions({ action: 'modify', resource: 'Articles', roleName: 'dev3' })).toBe(
-      false
-    );
+    expect(
+      Roles.hasPermissions({
+        action: 'modify',
+        resource: 'Articles',
+        roleName: 'dev3'
+      })
+    ).toBe(false);
   });
 
   it('return all role names - should get list of all of the roles', () => {
@@ -220,8 +256,38 @@ describe('Roles', () => {
     expect(role).toEqual(expectedRole);
   });
 
+  it('load roles from JSON', () => {
+    const oldRoles = Roles.toJSON();
+    Roles.fromJSON([
+      {
+        name: 'admin',
+        permissions: [
+          { action: 'read', resource: 'view1', isDisallowing: true },
+          { action: 'read', resource: 'view2', isDisallowing: true },
+          { action: 'read', resource: 'view4', isDisallowing: false },
+          { action: 'write', resource: 'view4', isDisallowing: false }
+        ]
+      },
+      { name: 'dev', permissions: [{ action: 'read', resource: 'view3', isDisallowing: true }] },
+      {
+        name: 'dev1',
+        permissions: [{ action: 'read', resource: 'SomeObject', isDisallowing: true }]
+      },
+      {
+        name: 'dev2',
+        permissions: [{ action: 'read', resource: 'SomeObject', isDisallowing: true }]
+      },
+      { name: 'dev3', permissions: [{ action: 'read', resource: 'goofy', isDisallowing: true }] }
+    ]);
+    expect(oldRoles).toEqual(Roles.toJSON());
+  });
+
   it('remove permission - permission should be removed', () => {
-    Roles.removePermission({ action: 'read', resource: 'view2', roleName: 'admin' });
+    Roles.removePermission({
+      action: 'read',
+      resource: 'view2',
+      roleName: 'admin'
+    });
     const role = Roles.rolesByName('admin');
     const expectedRole = {
       name: 'admin',
@@ -235,11 +301,19 @@ describe('Roles', () => {
   });
 
   it('remove permission from role that does not exist - should throw error', () => {
-    expect(() => Roles.removePermission({ action: 'read', resource: 'view2', roleName: 'adminster' })).toThrow('Role adminster not found');
+    expect(() => Roles.removePermission({
+      action: 'read',
+      resource: 'view2',
+      roleName: 'adminster'
+    })).toThrow('Role adminster not found');
   });
 
   it('remove permission from role that does not have that permission - should thorw error', () => {
-    expect(() => Roles.removePermission({ action: 'modify', resource: 'view2', roleName: 'admin' })).toThrow('Permission action: modify resource: view2 not found');
+    expect(() => Roles.removePermission({
+      action: 'modify',
+      resource: 'view2',
+      roleName: 'admin'
+    })).toThrow('Permission action: modify resource: view2 not found');
   });
 
   it('remove admin role', () => {
