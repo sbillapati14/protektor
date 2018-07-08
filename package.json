@@ -4,7 +4,8 @@
   "description": "",
   "main": "dist/index.js",
   "scripts": {
-    "test": "npm run lint && NODE_ENV=test jest --config ./jest.config.js",
+    "test": "npm run lint && NODE_ENV=test jest --coverage --config ./jest.config.js",
+    "test:watch": "jest --watch --config ./jest.config.js",
     "lint": "eslint -c .eslintrc src",
     "prebuild": "npm run lint && rimraf dist",
     "build": "npm-run-all --parallel build:*",
