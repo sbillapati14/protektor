@@ -243,7 +243,7 @@ describe('Roles', () => {
   });
 
   it('find specific role - should return role with its permissions', () => {
-    const role = Roles.rolesByName('admin');
+    const role = Roles.roleByName('admin');
     const expectedRole = {
       name: 'admin',
       permissions: [
@@ -288,7 +288,7 @@ describe('Roles', () => {
       resource: 'view2',
       roleName: 'admin'
     });
-    const role = Roles.rolesByName('admin');
+    const role = Roles.roleByName('admin');
     const expectedRole = {
       name: 'admin',
       permissions: [

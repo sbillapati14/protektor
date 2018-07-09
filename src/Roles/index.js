@@ -1,40 +1,15 @@
 const { requiredParam, getResourceName } = require('../utils');
-const {
-  RoleNotFoundError,
-  PermissionNotFoundError,
-  InvalidPayloadTypeError
-} = require('../Errors');
+const createMemstore = require('../Store/MemStore');
 
 module.exports = function createRoles() {
-  const roles = [];
+  let store = createMemstore();
 
   function createPermission({
     action, resource, roleName, isDisallowing
   }) {
     const resourceName = getResourceName(resource);
-    let role = roles.find(aRole => aRole.name === roleName);
-    if (!role) {
-      role = {
-        name: roleName,
-        permissions: []
-      };
-      roles.push(role);
-    }
-
-    let permission = role.permissions.find(
-      aPermission => aPermission.action === action && aPermission.resource === resourceName
-    );
-    if (!permission) {
-      permission = {
-        action: '',
-        resource: '',
-        isDisallowing
-      };
-      role.permissions.push(permission);
-    }
-    permission.action = action;
-    permission.resource = resourceName;
-    permission.isDisallowing = isDisallowing;
+    store.addRole(roleName);
+    store.addPermission(action, resourceName, isDisallowing, roleName);
   }
 
   function allow({
@@ -73,16 +48,10 @@ module.exports = function createRoles() {
       return true;
     }
 
-    const role = roles.find(aRole => aRole.name === roleName);
-    if (!role) {
-      // role does not exist so deny access
-      return false;
-    }
-
-    const permission = role.permissions.find(
-      aPermission => aPermission.action === action && aPermission.resource === resource
-    );
-    if (!permission) {
+    let permission;
+    try {
+      permission = store.getPermission(action, resource, roleName);
+    } catch (error) {
       // role has no permissions for this action or role
       return false;
     }
@@ -100,78 +69,31 @@ module.exports = function createRoles() {
     resource = requiredParam('resource'),
     roleName = requiredParam('roleName')
   }) {
-    const requestedRole = roles.find(aRole => aRole.name === roleName);
-    if (!requestedRole) {
-      throw new RoleNotFoundError(roleName);
-    }
-
-    const requestedPermissionIndex = requestedRole.permissions.findIndex(
-      aPerm => aPerm.action === action && aPerm.resource === resource
-    );
-
-    if (requestedPermissionIndex === -1) {
-      throw new PermissionNotFoundError(action, resource);
-    }
-
-    requestedRole.permissions.splice(requestedPermissionIndex, 1);
+    store.removePermission(action, resource, roleName);
   }
 
-  function rolesByName(roleName) {
-    const foundRole = roles.find(aRole => aRole.name === roleName);
-    return { ...foundRole };
+  function roleByName(roleName) {
+    return store.getRoleByName(roleName);
   }
 
   function allRoles() {
-    return roles.map(aRole => aRole.name);
+    return store.allRoles();
   }
 
   function removeRole(roleName) {
-    const roleIndex = roles.findIndex(aRole => aRole.name === roleName);
-    if (roleIndex === -1) {
-      throw new RoleNotFoundError(roleName);
-    }
-
-    roles.splice(roleIndex, 1);
+    store.removeRole(roleName);
   }
 
   function fromJSON(data) {
-    roles.length = 0;
-
-    if (!data || !Array.isArray(data)) {
-      throw new InvalidPayloadTypeError('Invalid role payload');
-    }
-
-    data.forEach((role) => {
-      if (!role.name) {
-        throw new InvalidPayloadTypeError('Invalid role name');
-      }
-
-      if (!role.permissions || !Array.isArray(role.permissions)) {
-        throw new InvalidPayloadTypeError(`Invalid permissions type for role: ${role.name}`);
-      }
-
-      role.permissions.forEach((perm) => {
-        if (
-          !perm.action
-          || !perm.resource
-          || !perm.isDisallowing === undefined
-          || !perm.isDisallowing === null
-        ) {
-          throw new InvalidPayloadTypeError(`Invalid permission payload for role ${role.name}`);
-        }
-
-        createPermission({
-          action: perm.action,
-          resource: perm.resource,
-          roleName: role.name,
-          isDisallowing: perm.isDisallowing
-        });
-      });
-    });
+    return store.fromJSON(data);
   }
 
   function toJSON() {
-    return [...roles];
+    return store.toJSON();
+  }
+
+  function useStore(newStore) {
+    store = newStore;
   }
 
   return Object.freeze({
@@ -179,10 +101,11 @@ module.exports = function createRoles() {
     forbid,
     hasPermissions,
     removePermission,
-    rolesByName,
+    roleByName,
     allRoles,
     removeRole,
     fromJSON,
-    toJSON
+    toJSON,
+    useStore
   });
 };
