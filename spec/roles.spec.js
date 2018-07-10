@@ -4,6 +4,7 @@ import {
   RoleNotFoundError,
   PermissionNotFoundError
 } from '../src/Errors';
+import createMemstore from '../src/Store/MemStore';
 
 describe('Roles', () => {
   it('create allow permissions - new role should be created', () => {
@@ -324,5 +325,67 @@ describe('Roles', () => {
 
   it('remove role that does not exist - should throw error', () => {
     expect(() => Roles.removeRole('notthere')).toThrow('Role notthere not found');
+  });
+
+  it('initialize store explictly', () => {
+    const memStore = createMemstore();
+    const rolesData = [
+      {
+        name: 'admin',
+        permissions: [
+          { action: 'read', resource: 'view1', isDisallowing: true },
+          { action: 'read', resource: 'view2', isDisallowing: true },
+          { action: 'read', resource: 'view4', isDisallowing: false },
+          { action: 'write', resource: 'view4', isDisallowing: false }
+        ]
+      },
+      { name: 'dev', permissions: [{ action: 'read', resource: 'view3', isDisallowing: true }] },
+      {
+        name: 'dev1',
+        permissions: [{ action: 'read', resource: 'SomeObject', isDisallowing: true }]
+      },
+      {
+        name: 'dev2',
+        permissions: [{ action: 'read', resource: 'SomeObject', isDisallowing: true }]
+      },
+      { name: 'dev3', permissions: [{ action: 'read', resource: 'goofy', isDisallowing: true }] }
+    ];
+    Roles.useStore(memStore);
+    Roles.fromJSON(rolesData);
+    expect(rolesData).toEqual(Roles.toJSON());
+  });
+
+  it('hasPermissions with invalid action', () => {
+    expect(() => Roles.hasPermissions('read', '', 'admin')).toThrow(
+      'Invalid or missing parameter: action'
+    );
+  });
+
+  it('hasPermissions with invalid resource', () => {
+    expect(() => Roles.hasPermissions({ action: 'read', resource: undefined, roleName: 'admin' })).toThrow('Invalid or missing parameter: resource');
+  });
+
+  it('hasPermissions with invalid roleName', () => {
+    expect(() => Roles.hasPermissions({ action: 'read', resource: 'view4', role: 'admin' })).toThrow('Invalid or missing parameter: roleName');
+  });
+
+  it('test creation fromJSON with invalid data - invalid main top level list', () => {
+    expect(() => Roles.fromJSON({})).toThrow('Invalid role payload');
+  });
+
+  it('test creation fromJSON with invalid data - missing role name', () => {
+    expect(() => Roles.fromJSON([{}])).toThrow('Invalid role name');
+  });
+
+  it('test creation fromJSON with invalid data - missing premissions', () => {
+    expect(() => Roles.fromJSON([{ name: 'admin' }])).toThrow(
+      'Invalid permissions type for role: admin'
+    );
+  });
+
+  it('test creation fromJSON with invalid data - invalid permission payload', () => {
+    expect(() => Roles.fromJSON([{ name: 'admin', permissions: [{}] }])).toThrow(
+      'Invalid permission payload for role admin'
+    );
   });
 });

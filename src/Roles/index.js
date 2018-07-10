@@ -17,6 +17,13 @@ module.exports = function createRoles() {
     resource = requiredParam('resource'),
     roleName = requiredParam('roleName')
   }) {
+    // if (typeof action === 'string') {
+    //
+    // } else if (Array.isArray(action)) {
+    //
+    // } else {
+    //
+    // }
     createPermission({
       action,
       resource,
