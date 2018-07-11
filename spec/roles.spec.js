@@ -1,10 +1,9 @@
-import { Roles } from '../src';
+import { Roles, createMemstore } from '../src';
 import {
   InvalidResourceTypeError,
   RoleNotFoundError,
   PermissionNotFoundError
 } from '../src/Errors';
-import createMemstore from '../src/Store/MemStore';
 
 describe('Roles', () => {
   it('create allow permissions - new role should be created', () => {
