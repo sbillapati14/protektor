@@ -7,7 +7,7 @@ export default {
   output: {
     path: join(__dirname, 'dist'),
     libraryTarget: 'umd',
-    library: 'protektor'
+    library: '@iris-platform/protektor'
   },
   devtool: 'source-map',
   module: {

@@ -1,5 +1,5 @@
 {
-  "name": "protektor",
+  "name": "@iris-platform/protektor",
   "version": "1.0.1",
   "description": "",
   "main": "dist/index.js",
