@@ -2,7 +2,7 @@ const { InvalidResourceTypeError } = require('../Errors');
 
 function getResourceName(subject) {
   if (!subject) {
-    throw InvalidResourceTypeError();
+    throw new InvalidResourceTypeError();
   }
   if (typeof subject === 'string') {
     return subject;

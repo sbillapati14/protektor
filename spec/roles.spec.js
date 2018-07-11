@@ -388,4 +388,50 @@ describe('Roles', () => {
       'Invalid permission payload for role admin'
     );
   });
+
+  it('forbid with invalid action', () => {
+    expect(() => Roles.forbid('read', '', 'admin')).toThrow('Invalid or missing parameter: action');
+  });
+
+  it('forbid with invalid resource', () => {
+    expect(() => Roles.forbid({ action: 'read', resource: undefined, roleName: 'admin' })).toThrow(
+      'Invalid or missing parameter: resource'
+    );
+  });
+
+  it('forbid with invalid roleName', () => {
+    expect(() => Roles.forbid({ action: 'read', resource: 'view4', role: 'admin' })).toThrow(
+      'Invalid or missing parameter: roleName'
+    );
+  });
+
+  it('allow with invalid action', () => {
+    expect(() => Roles.allow('read', '', 'admin')).toThrow('Invalid or missing parameter: action');
+  });
+
+  it('allow with invalid resource', () => {
+    expect(() => Roles.allow({ action: 'read', resource: undefined, roleName: 'admin' })).toThrow(
+      'Invalid or missing parameter: resource'
+    );
+  });
+
+  it('allow with invalid roleName', () => {
+    expect(() => Roles.allow({ action: 'read', resource: 'view4', role: 'admin' })).toThrow(
+      'Invalid or missing parameter: roleName'
+    );
+  });
+
+  it('removePermission with invalid action', () => {
+    expect(() => Roles.removePermission('read', '', 'admin')).toThrow(
+      'Invalid or missing parameter: action'
+    );
+  });
+
+  it('removePermission with invalid resource', () => {
+    expect(() => Roles.removePermission({ action: 'read', resource: undefined, roleName: 'admin' })).toThrow('Invalid or missing parameter: resource');
+  });
+
+  it('removePermission with invalid roleName', () => {
+    expect(() => Roles.removePermission({ action: 'read', resource: 'view4', role: 'admin' })).toThrow('Invalid or missing parameter: roleName');
+  });
 });

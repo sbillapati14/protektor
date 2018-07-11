@@ -1,7 +1,7 @@
 const requiredParam = (param) => {
   const invalidOrMissingParam = new Error(`Invalid or missing parameter: ${param}`);
 
-  if (typeof Error.captureStackTrace === 'function') {
+  if (Error.captureStackTrace) {
     Error.captureStackTrace(invalidOrMissingParam, requiredParam);
   }
 
