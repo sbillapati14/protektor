@@ -1,7 +1,12 @@
 const createRoles = require('./Roles');
 const createMemstore = require('./Store/MemStore');
+const { Role, Permission } = require('./Role');
+const { HasPermission } = require('./React/HasPermission');
 
 module.exports = {
   Roles: createRoles(),
-  createMemstore
+  createMemstore,
+  Role,
+  Permission,
+  HasPermission
 };

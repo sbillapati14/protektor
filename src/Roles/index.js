@@ -1,4 +1,4 @@
-const { requiredParam, getResourceName } = require('../utils');
+const { requiredParam, getResourceName, checkPermission } = require('../utils');
 const createMemstore = require('../Store/MemStore');
 
 module.exports = function createRoles() {
@@ -63,12 +63,12 @@ module.exports = function createRoles() {
       return false;
     }
 
-    if (!permission.isDisallowing) {
-      // role has permission for this action on this resource
-      return true;
-    }
-
-    return false;
+    return checkPermission({
+      action,
+      resource,
+      roleName,
+      permission
+    });
   }
 
   function removePermission({
