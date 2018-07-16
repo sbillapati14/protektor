@@ -13,7 +13,7 @@ describe('Roles', () => {
       name: 'admin',
       permissions: [{ action: 'read', resource: 'view1', isDisallowing: false }]
     };
-    expect(roleModel).toContainEqual(expectedPermission);
+    expect(roleModel.roles).toContainEqual(expectedPermission);
   });
 
   it('create allow permissions - existing role should be updated', () => {
@@ -26,7 +26,7 @@ describe('Roles', () => {
         { action: 'read', resource: 'view2', isDisallowing: false }
       ]
     };
-    expect(roleModel).toContainEqual(expectedPermission);
+    expect(roleModel.roles).toContainEqual(expectedPermission);
   });
 
   it('create allow permissions - additional role should be created', () => {
@@ -36,7 +36,7 @@ describe('Roles', () => {
       name: 'dev',
       permissions: [{ action: 'read', resource: 'view3', isDisallowing: false }]
     };
-    expect(roleModel).toContainEqual(expectedPermission);
+    expect(roleModel.roles).toContainEqual(expectedPermission);
   });
 
   it('create allow permission with class type - should add name of class as resource', () => {
@@ -47,7 +47,7 @@ describe('Roles', () => {
       name: 'dev1',
       permissions: [{ action: 'read', resource: 'SomeObject', isDisallowing: false }]
     };
-    expect(roleModel).toContainEqual(expectedPermission);
+    expect(roleModel.roles).toContainEqual(expectedPermission);
   });
 
   it('create allow permission with instance of the class type - should add name of class as resource', () => {
@@ -62,7 +62,7 @@ describe('Roles', () => {
       name: 'dev2',
       permissions: [{ action: 'read', resource: 'SomeObject', isDisallowing: false }]
     };
-    expect(roleModel).toContainEqual(expectedPermission);
+    expect(roleModel.roles).toContainEqual(expectedPermission);
   });
 
   it('create allow permission with function type - should add name of function as resource', () => {
@@ -73,7 +73,7 @@ describe('Roles', () => {
       name: 'dev3',
       permissions: [{ action: 'read', resource: 'goofy', isDisallowing: false }]
     };
-    expect(roleModel).toContainEqual(expectedPermission);
+    expect(roleModel.roles).toContainEqual(expectedPermission);
   });
 
   it('create allow permission with undefined type - should throw Invalid or missing parameter error', () => {
@@ -93,7 +93,7 @@ describe('Roles', () => {
         { action: 'read', resource: 'view2', isDisallowing: false }
       ]
     };
-    expect(roleModel).toContainEqual(expectedPermission);
+    expect(roleModel.roles).toContainEqual(expectedPermission);
   });
 
   it('create forbid permissions - existing role should be updated', () => {
@@ -106,7 +106,7 @@ describe('Roles', () => {
         { action: 'read', resource: 'view2', isDisallowing: true }
       ]
     };
-    expect(roleModel).toContainEqual(expectedPermission);
+    expect(roleModel.roles).toContainEqual(expectedPermission);
   });
 
   it('create forbid permissions - additional role should be created', () => {
@@ -116,7 +116,7 @@ describe('Roles', () => {
       name: 'dev',
       permissions: [{ action: 'read', resource: 'view3', isDisallowing: true }]
     };
-    expect(roleModel).toContainEqual(expectedPermission);
+    expect(roleModel.roles).toContainEqual(expectedPermission);
   });
 
   it('create forbid permission with class type - should add name of class as resource', () => {
@@ -127,7 +127,7 @@ describe('Roles', () => {
       name: 'dev1',
       permissions: [{ action: 'read', resource: 'SomeObject', isDisallowing: true }]
     };
-    expect(roleModel).toContainEqual(expectedPermission);
+    expect(roleModel.roles).toContainEqual(expectedPermission);
   });
 
   it('create forbid permission with instance of the class type - should add name of class as resource', () => {
@@ -142,7 +142,7 @@ describe('Roles', () => {
       name: 'dev2',
       permissions: [{ action: 'read', resource: 'SomeObject', isDisallowing: true }]
     };
-    expect(roleModel).toContainEqual(expectedPermission);
+    expect(roleModel.roles).toContainEqual(expectedPermission);
   });
 
   it('create forbid permission with function type - should add name of function as resource', () => {
@@ -153,7 +153,7 @@ describe('Roles', () => {
       name: 'dev3',
       permissions: [{ action: 'read', resource: 'goofy', isDisallowing: true }]
     };
-    expect(roleModel).toContainEqual(expectedPermission);
+    expect(roleModel.roles).toContainEqual(expectedPermission);
   });
 
   it('create forbid permission with undefined type - should throw Invalid or missing parameter error', () => {
@@ -186,7 +186,7 @@ describe('Roles', () => {
         { action: 'write', isDisallowing: false, resource: 'view4' }
       ]
     };
-    expect(roleModel).toContainEqual(expectedPermission);
+    expect(roleModel.roles).toContainEqual(expectedPermission);
     expect(
       Roles.hasPermissions({
         action: 'read',
@@ -258,28 +258,31 @@ describe('Roles', () => {
 
   it('load roles from JSON', () => {
     const oldRoles = Roles.toJSON();
-    Roles.fromJSON([
-      {
-        name: 'admin',
-        permissions: [
-          { action: 'read', resource: 'view1', isDisallowing: true },
-          { action: 'read', resource: 'view2', isDisallowing: true },
-          { action: 'read', resource: 'view4', isDisallowing: false },
-          { action: 'write', resource: 'view4', isDisallowing: false }
-        ]
-      },
-      { name: 'dev', permissions: [{ action: 'read', resource: 'view3', isDisallowing: true }] },
-      {
-        name: 'dev1',
-        permissions: [{ action: 'read', resource: 'SomeObject', isDisallowing: true }]
-      },
-      {
-        name: 'dev2',
-        permissions: [{ action: 'read', resource: 'SomeObject', isDisallowing: true }]
-      },
-      { name: 'dev3', permissions: [{ action: 'read', resource: 'goofy', isDisallowing: true }] }
-    ]);
-    expect(oldRoles).toEqual(Roles.toJSON());
+    Roles.fromJSON({
+      roles: [
+        {
+          name: 'admin',
+          permissions: [
+            { action: 'read', resource: 'view1', isDisallowing: true },
+            { action: 'read', resource: 'view2', isDisallowing: true },
+            { action: 'read', resource: 'view4', isDisallowing: false },
+            { action: 'write', resource: 'view4', isDisallowing: false }
+          ]
+        },
+        { name: 'dev', permissions: [{ action: 'read', resource: 'view3', isDisallowing: true }] },
+        {
+          name: 'dev1',
+          permissions: [{ action: 'read', resource: 'SomeObject', isDisallowing: true }]
+        },
+        {
+          name: 'dev2',
+          permissions: [{ action: 'read', resource: 'SomeObject', isDisallowing: true }]
+        },
+        { name: 'dev3', permissions: [{ action: 'read', resource: 'goofy', isDisallowing: true }] }
+      ],
+      modelResourceAccessMap: []
+    });
+    expect(oldRoles.roles).toEqual(Roles.toJSON().roles);
   });
 
   it('remove permission - permission should be removed', () => {
@@ -350,8 +353,8 @@ describe('Roles', () => {
       { name: 'dev3', permissions: [{ action: 'read', resource: 'goofy', isDisallowing: true }] }
     ];
     Roles.useStore(memStore);
-    Roles.fromJSON(rolesData);
-    expect(rolesData).toEqual(Roles.toJSON());
+    Roles.fromJSON({ roles: rolesData, modelResourceAccessMap: [] });
+    expect(rolesData).toEqual(Roles.toJSON().roles);
   });
 
   it('hasPermissions with invalid action', () => {
@@ -369,23 +372,21 @@ describe('Roles', () => {
   });
 
   it('test creation fromJSON with invalid data - invalid main top level list', () => {
-    expect(() => Roles.fromJSON({})).toThrow('Invalid role payload');
+    expect(() => Roles.fromJSON({})).toThrow('Invalid or missing parameter: rolesData');
   });
 
-  it('test creation fromJSON with invalid data - missing role name', () => {
-    expect(() => Roles.fromJSON([{}])).toThrow('Invalid role name');
-  });
-
-  it('test creation fromJSON with invalid data - missing premissions', () => {
-    expect(() => Roles.fromJSON([{ name: 'admin' }])).toThrow(
-      'Invalid permissions type for role: admin'
+  it('test creation fromJSON with invalid data - missing modelResourceAccessMapData', () => {
+    expect(() => Roles.fromJSON({ roles: [{}] })).toThrow(
+      'Invalid or missing parameter: modelResourceAccessMapData'
     );
+  });
+
+  it('test creation fromJSON with invalid data - missing permissions', () => {
+    expect(() => Roles.fromJSON({ roles: [{ name: 'admin' }], modelResourceAccessMap: [] })).toThrow('Invalid permissions type for role: admin');
   });
 
   it('test creation fromJSON with invalid data - invalid permission payload', () => {
-    expect(() => Roles.fromJSON([{ name: 'admin', permissions: [{}] }])).toThrow(
-      'Invalid permission payload for role admin'
-    );
+    expect(() => Roles.fromJSON({ roles: [{ name: 'admin', permissions: [{}] }], modelResourceAccessMap: [] })).toThrow('Invalid permission payload for role admin');
   });
 
   it('forbid with invalid action', () => {

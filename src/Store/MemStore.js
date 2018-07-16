@@ -1,11 +1,34 @@
 const {
   RoleNotFoundError,
   PermissionNotFoundError,
-  InvalidPayloadTypeError
+  InvalidPayloadTypeError,
+  ModelResourceMapNotFoundError
 } = require('../Errors');
+const { requiredParam } = require('../utils');
 
 module.exports = function createMemstore() {
   const roles = [];
+  const modelResourceAccessMap = [];
+
+  function addModelResourceMap(resource, model) {
+    modelResourceAccessMap.push({
+      resource,
+      model
+    });
+  }
+
+  function removeModelResourceMap(resource, model) {
+    const mapIndex = modelResourceAccessMap.findIndex(
+      aMap => aMap.resource === resource && aMap.model === model
+    );
+    if (mapIndex === -1) {
+      throw new ModelResourceMapNotFoundError(model, resource);
+    }
+  }
+
+  function findModelResourceMap(resource, model) {
+    return modelResourceAccessMap.find(aMap => aMap.resource === resource && aMap.model === model);
+  }
 
   function addRole(roleName) {
     let role = roles.find(aRole => aRole.name === roleName);
@@ -91,17 +114,25 @@ module.exports = function createMemstore() {
   }
 
   function toJSON() {
-    return [...roles];
+    return {
+      roles: [...roles],
+      modelResourceAccessMap: [...modelResourceAccessMap]
+    };
   }
 
-  function fromJSON(data) {
+  function fromJSON({
+    rolesData = requiredParam('rolesData'),
+    modelResourceAccessMapData = requiredParam('modelResourceAccessMapData')
+  }) {
     roles.length = 0;
+    modelResourceAccessMap.length = 0;
 
-    if (!data || !Array.isArray(data)) {
+    // read in roles
+    if (!rolesData || !Array.isArray(rolesData)) {
       throw new InvalidPayloadTypeError('Invalid role payload');
     }
 
-    data.forEach((role) => {
+    rolesData.forEach((role) => {
       if (!role.name) {
         throw new InvalidPayloadTypeError('Invalid role name');
       }
@@ -124,9 +155,28 @@ module.exports = function createMemstore() {
         addPermission(perm.action, perm.resource, perm.isDisallowing, role.name);
       });
     });
+
+    // read in modelResourceAccessMap
+    if (!modelResourceAccessMapData || !Array.isArray(modelResourceAccessMapData)) {
+      throw new InvalidPayloadTypeError('Invalid model resource access map payload');
+    }
+
+    modelResourceAccessMapData.forEach((aMap) => {
+      const addMapping = ({
+        resource = requiredParam('resource'),
+        model = requiredParam('model')
+      }) => ({
+        resource,
+        model
+      });
+      modelResourceAccessMap.push(addMapping({ resource: aMap.resource, model: aMap.model }));
+    });
   }
 
   return Object.freeze({
+    addModelResourceMap,
+    removeModelResourceMap,
+    findModelResourceMap,
     addRole,
     removeRole,
     addPermission,

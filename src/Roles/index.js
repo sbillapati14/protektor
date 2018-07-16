@@ -92,7 +92,10 @@ module.exports = function createRoles() {
   }
 
   function fromJSON(data) {
-    return store.fromJSON(data);
+    return store.fromJSON({
+      rolesData: data.roles,
+      modelResourceAccessMapData: data.modelResourceAccessMap
+    });
   }
 
   function toJSON() {
