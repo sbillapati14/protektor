@@ -1,7 +1,9 @@
 // model-resource access controller
 const { requiredParam, getResourceName, getModelName } = require('../utils');
 
-module.exports = function MRAC(store) {
+module.exports = function MRAC(storeBackend) {
+  let store = storeBackend;
+
   function addModelResourceMap({
     resource = requiredParam('resource'),
     model = requiredParam('model')
@@ -16,8 +18,18 @@ module.exports = function MRAC(store) {
     store.removeModelResourceMap(getResourceName(resource), getModelName(model));
   }
 
+  function findMapping(resource = requiredParam('resource')) {
+    return store.findModelResourceMap(resource);
+  }
+
+  function useStore(newStore) {
+    store = newStore;
+  }
+
   return Object.freeze({
     addModelResourceMap,
-    removeModelResourceMap
+    removeModelResourceMap,
+    findMapping,
+    useStore
   });
 };

@@ -1,8 +1,10 @@
 const { requiredParam, getResourceName, checkPermission } = require('../utils');
 const createMemstore = require('../Store/MemStore');
+const MRAC = require('../MRAC');
 
 module.exports = function createRoles() {
   let store = createMemstore();
+  const mrac = MRAC(store);
 
   function createPermission({
     action, resource, roleName, isDisallowing
@@ -91,6 +93,24 @@ module.exports = function createRoles() {
     store.removeRole(roleName);
   }
 
+  function addModelResourceMap({
+    resource = requiredParam('resource'),
+    model = requiredParam('model')
+  }) {
+    mrac.addModelResourceMap({ resource, model });
+  }
+
+  function removeModelResourceMap({
+    resource = requiredParam('resource'),
+    model = requiredParam('model')
+  }) {
+    mrac.removeModelResourceMap({ resource, model });
+  }
+
+  function findMapping(resource = requiredParam('resource')) {
+    return mrac.findMapping(resource);
+  }
+
   function fromJSON(data) {
     return store.fromJSON({
       rolesData: data.roles,
@@ -104,6 +124,7 @@ module.exports = function createRoles() {
 
   function useStore(newStore) {
     store = newStore;
+    mrac.useStore(store);
   }
 
   return Object.freeze({
@@ -114,6 +135,9 @@ module.exports = function createRoles() {
     roleByName,
     allRoles,
     removeRole,
+    addModelResourceMap,
+    removeModelResourceMap,
+    findMapping,
     fromJSON,
     toJSON,
     useStore

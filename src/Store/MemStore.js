@@ -24,10 +24,14 @@ module.exports = function createMemstore() {
     if (mapIndex === -1) {
       throw new ModelResourceMapNotFoundError(model, resource);
     }
+
+    modelResourceAccessMap.splice(mapIndex, 1);
   }
 
-  function findModelResourceMap(resource, model) {
-    return modelResourceAccessMap.find(aMap => aMap.resource === resource && aMap.model === model);
+  function findModelResourceMap(resource) {
+    return modelResourceAccessMap
+      .filter(aMap => aMap.resource === resource)
+      .map(mapping => mapping.model);
   }
 
   function addRole(roleName) {

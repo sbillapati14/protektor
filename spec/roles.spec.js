@@ -285,6 +285,74 @@ describe('Roles', () => {
     expect(oldRoles.roles).toEqual(Roles.toJSON().roles);
   });
 
+  it('add model-resource mapping', () => {
+    Roles.addModelResourceMap({ resource: 'view1', model: 'Users' });
+    const payload = Roles.toJSON();
+    expect(payload.modelResourceAccessMap).toEqual([{ resource: 'view1', model: 'Users' }]);
+  });
+
+  it('find existing model-resource mapping', () => {
+    const mrmapping = Roles.findMapping('view1');
+    expect(mrmapping).toEqual(['Users']);
+  });
+
+  it('look for non-existing model-resource mapping', () => {
+    const mrmapping = Roles.findMapping('view12');
+    expect(mrmapping).toEqual([]);
+  });
+
+  it('do not provide resource for model-resource mapping', () => {
+    expect(() => Roles.findMapping()).toThrow('Invalid or missing parameter: resource');
+  });
+
+  it('add additional model-resource mapping', () => {
+    Roles.addModelResourceMap({ resource: 'view1', model: 'Roles' });
+    const payload = Roles.toJSON();
+    expect(payload.modelResourceAccessMap).toEqual([
+      { resource: 'view1', model: 'Users' },
+      { resource: 'view1', model: 'Roles' }
+    ]);
+  });
+
+  it('find resource with multiple models', () => {
+    const mrmapping = Roles.findMapping('view1');
+    expect(mrmapping).toEqual(['Users', 'Roles']);
+  });
+
+  it('remove model-resource mapping', () => {
+    Roles.removeModelResourceMap({ resource: 'view1', model: 'Roles' });
+    const payload = Roles.toJSON();
+    expect(payload.modelResourceAccessMap).toEqual([{ resource: 'view1', model: 'Users' }]);
+  });
+
+  it('remove non-existing model-resource mapping', () => {
+    expect(() => Roles.removeModelResourceMap({ resource: 'view12', model: 'Domain' })).toThrow(
+      'Resource view12 to Model Domain mapping not found'
+    );
+  });
+
+  it('add additional model-resource mapping with model being an object', () => {
+    class Domain {}
+    Roles.addModelResourceMap({ resource: 'view1', model: Domain });
+    const payload = Roles.toJSON();
+    expect(payload.modelResourceAccessMap).toEqual([
+      { resource: 'view1', model: 'Users' },
+      { resource: 'view1', model: 'Domain' }
+    ]);
+  });
+
+  it('add additional model-resource mapping with model being an instance', () => {
+    class Apps {}
+    const apps = new Apps();
+    Roles.addModelResourceMap({ resource: 'view1', model: apps });
+    const payload = Roles.toJSON();
+    expect(payload.modelResourceAccessMap).toEqual([
+      { resource: 'view1', model: 'Users' },
+      { resource: 'view1', model: 'Domain' },
+      { resource: 'view1', model: 'Apps' }
+    ]);
+  });
+
   it('remove permission - permission should be removed', () => {
     Roles.removePermission({
       action: 'read',
