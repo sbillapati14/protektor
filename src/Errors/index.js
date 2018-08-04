@@ -4,6 +4,7 @@ const PermissionNotFoundError = require('./PermissionNotFoundError');
 const InvalidPayloadTypeError = require('./InvalidPayloadTypeError');
 const InvalidModelTypeError = require('./InvalidModelTypeError');
 const ModelResourceMapNotFoundError = require('./ModelResourceMapNotFoundError');
+const RoleDisabledError = require('./RoleDisabledError');
 
 module.exports = {
   InvalidResourceTypeError,
@@ -11,5 +12,6 @@ module.exports = {
   PermissionNotFoundError,
   InvalidPayloadTypeError,
   InvalidModelTypeError,
-  ModelResourceMapNotFoundError
+  ModelResourceMapNotFoundError,
+  RoleDisabledError
 };
