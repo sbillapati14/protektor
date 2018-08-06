@@ -5,6 +5,7 @@ const InvalidPayloadTypeError = require('./InvalidPayloadTypeError');
 const InvalidModelTypeError = require('./InvalidModelTypeError');
 const ModelResourceMapNotFoundError = require('./ModelResourceMapNotFoundError');
 const RoleDisabledError = require('./RoleDisabledError');
+const InvalidOrMissingAdapterError = require('./InvalidOrMissingAdapterError');
 
 module.exports = {
   InvalidResourceTypeError,
@@ -13,5 +14,6 @@ module.exports = {
   InvalidPayloadTypeError,
   InvalidModelTypeError,
   ModelResourceMapNotFoundError,
-  RoleDisabledError
+  RoleDisabledError,
+  InvalidOrMissingAdapterError
 };

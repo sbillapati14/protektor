@@ -1,4 +1,4 @@
-[![Build][Build-Status-Image]][Build-Status-Url] [![Release][Release-Image]][Release-Url] [![License][License-Image]][License-Url]
+[![Build][Build-Status-Image]][Build-Status-Url] [![License][License-Image]][License-Url]
 
 
 # Protektor
