@@ -63,6 +63,8 @@ class ProtektorMemAdapter {
       { action, resourceName, allowed },
       removePermissionIfExist(permissions)
     );
+
+    return Promise.resolve();
   }
 
   toJSON = () => clone(this.db);
@@ -74,7 +76,7 @@ class ProtektorMemAdapter {
       this.findResource(this.db.resources)
     );
 
-    return findResourceModels(resourceName);
+    return Promise.resolve(findResourceModels(resourceName));
   }
 
   insertDataModels = (resourceName, models) => {
@@ -88,6 +90,7 @@ class ProtektorMemAdapter {
       removeResourceIfExists(resourceName)
     );
     this.db.resources = updatedResources;
+    return Promise.resolve();
   }
 
   insertAllow = (action, resourceName, roleName) => this.insertPermission(
@@ -121,14 +124,14 @@ class ProtektorMemAdapter {
       modelsOwnedByResources
     );
 
-    return contains(modelName, modelsOwnedByRole(resourcesOwnedByRole));
+    return Promise.resolve(contains(modelName, modelsOwnedByRole(resourcesOwnedByRole)));
   }
 
-  findAllResourceNames = () => map(pathOr([], ['resourceName']), this.db.resources);
+  findAllResourceNames = () => Promise.resolve(map(pathOr([], ['resourceName']), this.db.resources));
 
-  findAllRoles = () => map(clone, this.db.roles)
+  findAllRoles = () => Promise.resolve(map(clone, this.db.roles));
 
-  findRole = roleName => find(propEq('roleName', roleName), this.db.roles);
+  findRole = roleName => Promise.resolve(find(propEq('roleName', roleName), this.db.roles));
 }
 
 export default ProtektorMemAdapter;
