@@ -22,27 +22,18 @@ class ProtektorMemAdapter {
   db = {
     resources: [],
     roles: []
-  }
+  };
+
+  objectToArray = curry(obj => obj ? [obj] : []);
 
   matchResource = propEq('resourceName');
 
-  findResource = compose(
-    find(__, this.db.resources),
+  findResource = curry(resources => compose(
+    find(__, resources),
     this.matchResource,
-  );
+  ));
 
   pathToModels = pathOr([], ['models'])
-
-  findResourceModels = compose(
-    this.pathToModels,
-    this.findResource
-  );
-
-  removeResourceIfExists = compose(
-    without(__, this.db.resources),
-    this.objectToArray,
-    this.findResource
-  );
 
   matchRole = propEq('roleName');
 
@@ -57,7 +48,6 @@ class ProtektorMemAdapter {
       throw new RoleNotFoundError();
     }
 
-    const objectToArray = curry(obj => obj ? [obj] : []);
     const findPermission = (thisAction, thisResource) => find(where({
       action: equals(thisAction),
       resource: equals(thisResource)
@@ -65,7 +55,7 @@ class ProtektorMemAdapter {
     const permissions = pathOr([], ['permissions'], role);
     const removePermissionIfExist = compose(
       without(__, permissions),
-      objectToArray,
+      this.objectToArray,
       findPermission(action, resourceName)
     );
 
@@ -75,13 +65,30 @@ class ProtektorMemAdapter {
     );
   }
 
-  // Interface methods
-  findDataModels = resourceName => this.findResourceModels(resourceName);
+  toJSON = () => clone(this.db);
 
-  insertDataModels = (resourceName, models) => append(
-    { resourceName, models },
-    this.removeResourceIfExists(resourceName)
-  );
+  // Interface methods
+  findDataModels = (resourceName) => {
+    const findResourceModels = compose(
+      this.pathToModels,
+      this.findResource(this.db.resources)
+    );
+
+    return findResourceModels(resourceName);
+  }
+
+  insertDataModels = (resourceName, models) => {
+    const removeResourceIfExists = compose(
+      without(__, this.db.resources),
+      this.objectToArray,
+      this.findResource(this.db.resources)
+    );
+    const updatedResources = append(
+      { resourceName, models },
+      removeResourceIfExists(resourceName)
+    );
+    this.db.resources = updatedResources;
+  }
 
   insertAllow = (action, resourceName, roleName) => this.insertPermission(
     action, resourceName, roleName, true

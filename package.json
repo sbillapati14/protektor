@@ -8,10 +8,7 @@
     "test:watch": "jest --watch --config ./jest.config.js",
     "lint": "eslint -c .eslintrc src",
     "prebuild": "npm run lint && rimraf dist",
-    "build": "npm-run-all --parallel build:*",
-    "build:main": "babel --copy-files --out-dir dist src",
-    "build:umd": "webpack --mode production --output-filename protektor.js",
-    "build:umd.min": "webpack --mode production --output-filename protektor.min.js -p"
+    "build": "babel --copy-files --out-dir dist src"
   },
   "babel": {
     "presets": [

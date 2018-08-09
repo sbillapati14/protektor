@@ -1,7 +1,10 @@
-import createProtektor from './Protektor';
+import Protektor from './Protektor/index';
+import ProtektorMemAdapter from './ProtektorMemAdapter';
 import { HasPermission } from './React/HasPermission';
 
-module.exports = {
-  Protektor: createProtektor,
+export {
+  ProtektorMemAdapter,
   HasPermission
 };
+
+export default Protektor;
