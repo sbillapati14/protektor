@@ -43,23 +43,23 @@ describe('Protektor with mem adapter', () => {
       roleName: 'user1'
     });
 
-    await Protektor.allow({
-      action: 'write',
-      resource: 'Home',
-      roleName: 'user1'
-    });
+    // await Protektor.allow({
+    //   action: 'write',
+    //   resource: 'Home',
+    //   roleName: 'user1'
+    // });
 
-    await Protektor.allow({
-      action: 'write',
-      resource: 'Home',
-      roleName: 'user2'
-    });
+    // await Protektor.allow({
+    //   action: 'write',
+    //   resource: 'Home',
+    //   roleName: 'user2'
+    // });
 
-    await Protektor.allow({
-      action: 'read',
-      resource: 'Home',
-      roleName: 'user2'
-    });
+    // await Protektor.allow({
+    //   action: 'read',
+    //   resource: 'Home',
+    //   roleName: 'user2'
+    // });
 
     const isAllowed = await Protektor.hasPermission({
       action: 'read',

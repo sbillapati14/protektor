@@ -3,7 +3,6 @@ import {
   propEq,
   compose,
   find,
-  findIndex,
   __,
   append,
   without,
@@ -42,9 +41,7 @@ class ProtektorMemAdapter {
 
   matchRole = propEq('roleName');
 
-  findRole = (roleName, roles) => find(propEq('roleName', roleName), roles);
-
-  findRoleIdx = (roleName, roles) => findIndex(propEq('roleName', roleName), roles);
+  findRoleInternal = (roleName, roles) => find(propEq('roleName', roleName), roles);
 
   createNewRole = (action, resource, roleName, allowed) => ({
     roleName, permissions: [{ action, resource, allowed }]
@@ -120,7 +117,7 @@ class ProtektorMemAdapter {
   );
 
   findModel = (modelName, roleName) => {
-    const role = this.findRole(roleName, this.db.roles);
+    const role = this.findRoleInternal(roleName, this.db.roles);
     if (!role) {
       throw new RoleNotFoundError();
     }
@@ -146,7 +143,7 @@ class ProtektorMemAdapter {
   }
 
   hasPermission = (action, resource, roleName) => {
-    const role = this.findRole(roleName, this.db.roles);
+    const role = this.findRoleInternal(roleName, this.db.roles);
     if (!role) {
       throw new RoleNotFoundError();
     }
@@ -162,7 +159,7 @@ class ProtektorMemAdapter {
 
   findAllRoles = () => Promise.resolve(map(clone, this.db.roles));
 
-  findRole = roleName => Promise.resolve(find(propEq('roleName', roleName), this.db.roles));
+  findRole = roleName => Promise.resolve(this.findRoleInternal(roleName, this.db.roles));
 }
 
 export default ProtektorMemAdapter;
