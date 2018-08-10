@@ -3,18 +3,23 @@ import {
   propEq,
   compose,
   find,
+  findIndex,
   __,
   append,
   without,
   pathOr,
-  where,
-  equals,
   map,
   uniq,
   innerJoin,
   flatten,
   contains,
-  clone
+  clone,
+  ifElse,
+  set,
+  filter,
+  head,
+  lensProp,
+  isNil
 } from 'ramda';
 import { RoleNotFoundError } from '../Errors';
 
@@ -37,57 +42,70 @@ class ProtektorMemAdapter {
 
   matchRole = propEq('roleName');
 
-  findRole = compose(
-    find(__, this.db.roles),
-    this.matchRole,
-  );
+  findRole = (roleName, roles) => find(propEq('roleName', roleName), roles);
 
-  insertPermission = (action, resourceName, roleName, allowed) => {
-    const role = this.findRole(roleName);
-    if (!role) {
-      throw new RoleNotFoundError();
-    }
+  findRoleIdx = (roleName, roles) => findIndex(propEq('roleName', roleName), roles);
 
-    const findPermission = (thisAction, thisResource) => find(where({
-      action: equals(thisAction),
-      resource: equals(thisResource)
-    }));
-    const permissions = pathOr([], ['permissions'], role);
-    const removePermissionIfExist = compose(
-      without(__, permissions),
-      this.objectToArray,
-      findPermission(action, resourceName)
+  createNewRole = (action, resource, roleName, allowed) => ({
+    roleName, permissions: [{ action, resource, allowed }]
+  });
+
+  insertPermission = (action, resource, roleName, allowed) => {
+    const newRole = this.createNewRole(action, resource, roleName, allowed);
+    const existingRole = curry(roles => find(propEq('roleName', roleName), roles));
+    const isNewRole = compose(
+      isNil,
+      existingRole
     );
-
-    role.permissions = append(
-      { action, resourceName, allowed },
-      removePermissionIfExist(permissions)
+    const matchPermissions = curry((toRemove, elem) => (elem.action !== toRemove.action || elem.resource !== toRemove.resource));
+    const matchRole = curry((toRemove, elem) => elem.roleName !== toRemove.roleName);
+    const removeDup = (matcher, toRemove) => filter(matcher(toRemove));
+    const mergeObjectToList = (matcher, newObj, list) => compose(
+      append(newObj),
+      removeDup(matcher, newObj),
+    )(list);
+    const updateExistingRole = curry((roleToAdd, roles) => {
+      const roleToUpdate = existingRole(roles);
+      const newPermissions = mergeObjectToList(matchPermissions, head(roleToAdd.permissions), roleToUpdate.permissions);
+      const updatedRole = set(
+        lensProp('permissions'),
+        newPermissions,
+        roleToUpdate
+      );
+      const mergedRoles = mergeObjectToList(matchRole, updatedRole, roles);
+      return mergedRoles;
+    });
+    const updateRole = ifElse(
+      isNewRole,
+      append(newRole),
+      updateExistingRole(newRole)
     );
-
-    return Promise.resolve();
+    const updatedRoles = updateRole(this.db.roles);
+    this.db.roles = updatedRoles;
+    console.log('db:', JSON.stringify(this.db));
   }
 
   toJSON = () => clone(this.db);
 
   // Interface methods
-  findDataModels = (resourceName) => {
+  findDataModels = (resource) => {
     const findResourceModels = compose(
       this.pathToModels,
       this.findResource(this.db.resources)
     );
 
-    return Promise.resolve(findResourceModels(resourceName));
+    return Promise.resolve(findResourceModels(resource));
   }
 
-  insertDataModels = (resourceName, models) => {
+  insertDataModels = (resource, models) => {
     const removeResourceIfExists = compose(
       without(__, this.db.resources),
       this.objectToArray,
       this.findResource(this.db.resources)
     );
     const updatedResources = append(
-      { resourceName, models },
-      removeResourceIfExists(resourceName)
+      { resourceName: resource, models },
+      removeResourceIfExists(resource)
     );
     this.db.resources = updatedResources;
     return Promise.resolve();
@@ -102,7 +120,7 @@ class ProtektorMemAdapter {
   );
 
   findModel = (modelName, roleName) => {
-    const role = this.findRole(roleName);
+    const role = this.findRole(roleName, this.db.roles);
     if (!role) {
       throw new RoleNotFoundError();
     }
@@ -125,6 +143,19 @@ class ProtektorMemAdapter {
     );
 
     return Promise.resolve(contains(modelName, modelsOwnedByRole(resourcesOwnedByRole)));
+  }
+
+  hasPermission = (action, resource, roleName) => {
+    const role = this.findRole(roleName, this.db.roles);
+    if (!role) {
+      throw new RoleNotFoundError();
+    }
+    const permissions = pathOr([], ['permissions']);
+    const isAllowed = compose(
+      contains({ action, resource, allowed: true }),
+      permissions
+    );
+    return Promise.resolve(isAllowed(role));
   }
 
   findAllResourceNames = () => Promise.resolve(map(pathOr([], ['resourceName']), this.db.resources));

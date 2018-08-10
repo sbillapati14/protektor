@@ -24,11 +24,11 @@ This will return data model(s) associated with the given resource.
 # Define Permissions
 To define access permissions within a `role` specify allowed action on the resource:
 ```
-Protektor.allow(action, resource, roleName)
+Protektor.allow({ action, resource, roleName })
 
 or to disallow action explicitly:
 
-Protektor.forbid(action, resource, roleName)
+Protektor.forbid({ action, resource, roleName })
 ```
 
 It is possible to call allow and then forbid on the same resource, action, role.  The last call will overwrite permissions.
@@ -37,7 +37,7 @@ It is possible to call allow and then forbid on the same resource, action, role.
 Protektor library supports checking permissions for the given role on the server side via `hasPermission` API:
 
 ```
-Protektor.hasPermission(action, resource, roleName)
+Protektor.hasPermission({ action, resource, roleName })
 
 Returns true if permitted, otherwise false
 ```
@@ -45,7 +45,7 @@ Returns true if permitted, otherwise false
 On the server side you can also call `hasModel` API to verify that the given role has access to the data model you are trying to use:
 
 ```
-Protektor.hasModel(modelName, roleName)
+Protektor.hasModel({ modelName, roleName ])
 
 Returns true if the specified model is accessible by the role, otherwise false
 ```
@@ -53,7 +53,7 @@ Returns true if the specified model is accessible by the role, otherwise false
 Sometimes it is useful to get the actual model object if the role permits the access.  This can be accomplished with `getModel` API:
 
 ```
-Protektor.getModel(modelName, roleName, modelTransformCallback)
+Protektor.getModel({ modelName, roleName, modelTransformCallback })
 ```
 
 modelTransformCallback is a function that is called with modelName as parameter if the access to model is permitted or undefined if not permitted.
