@@ -36,36 +36,325 @@ describe('Protektor with mem adapter', () => {
     expect(homeModels).toEqual(['home', 'home2']);
   });
 
-  test('allow permission on resource and verify', async () => {
+  test('allow permission for first role', async () => {
     await Protektor.allow({
       action: 'read',
       resource: 'Home',
-      roleName: 'user1'
+      roleName: 'role1'
     });
-
-    // await Protektor.allow({
-    //   action: 'write',
-    //   resource: 'Home',
-    //   roleName: 'user1'
-    // });
-
-    // await Protektor.allow({
-    //   action: 'write',
-    //   resource: 'Home',
-    //   roleName: 'user2'
-    // });
-
-    // await Protektor.allow({
-    //   action: 'read',
-    //   resource: 'Home',
-    //   roleName: 'user2'
-    // });
 
     const isAllowed = await Protektor.hasPermission({
       action: 'read',
       resource: 'Home',
-      roleName: 'user1'
+      roleName: 'role1'
     });
     expect(isAllowed).toEqual(true);
+  });
+
+  test('add permission for second role', async () => {
+    await Protektor.allow({
+      action: 'write',
+      resource: 'Home',
+      roleName: 'role2'
+    });
+
+    const isAllowedRole1 = await Protektor.hasPermission({
+      action: 'read',
+      resource: 'Home',
+      roleName: 'role1'
+    });
+    const isAllowedRole2 = await Protektor.hasPermission({
+      action: 'write',
+      resource: 'Home',
+      roleName: 'role2'
+    });
+    expect(isAllowedRole1).toEqual(true);
+    expect(isAllowedRole2).toEqual(true);
+  });
+
+  test('add second permission for first role', async () => {
+    await Protektor.allow({
+      action: 'write',
+      resource: 'Home',
+      roleName: 'role1'
+    });
+
+    const isAllowedRole1 = await Protektor.hasPermission({
+      action: 'read',
+      resource: 'Home',
+      roleName: 'role1'
+    });
+    const isAllowedRole11 = await Protektor.hasPermission({
+      action: 'write',
+      resource: 'Home',
+      roleName: 'role1'
+    });
+    const isAllowedRole2 = await Protektor.hasPermission({
+      action: 'write',
+      resource: 'Home',
+      roleName: 'role2'
+    });
+    expect(isAllowedRole1).toEqual(true);
+    expect(isAllowedRole2).toEqual(true);
+    expect(isAllowedRole11).toEqual(true);
+  });
+
+  test('add second permission for second role', async () => {
+    await Protektor.allow({
+      action: 'read',
+      resource: 'Home',
+      roleName: 'role2'
+    });
+
+    const isAllowedRole1 = await Protektor.hasPermission({
+      action: 'read',
+      resource: 'Home',
+      roleName: 'role1'
+    });
+    const isAllowedRole11 = await Protektor.hasPermission({
+      action: 'write',
+      resource: 'Home',
+      roleName: 'role1'
+    });
+    const isAllowedRole2 = await Protektor.hasPermission({
+      action: 'write',
+      resource: 'Home',
+      roleName: 'role2'
+    });
+    const isAllowedRole22 = await Protektor.hasPermission({
+      action: 'write',
+      resource: 'Home',
+      roleName: 'role2'
+    });
+    expect(isAllowedRole1).toEqual(true);
+    expect(isAllowedRole2).toEqual(true);
+    expect(isAllowedRole11).toEqual(true);
+    expect(isAllowedRole22).toEqual(true);
+  });
+
+  test('forbid permission for first role', async () => {
+    await Protektor.forbid({
+      action: 'read',
+      resource: 'Reports',
+      roleName: 'role1'
+    });
+
+    const isAllowedRole1 = await Protektor.hasPermission({
+      action: 'read',
+      resource: 'Home',
+      roleName: 'role1'
+    });
+    const isAllowedRole11 = await Protektor.hasPermission({
+      action: 'write',
+      resource: 'Home',
+      roleName: 'role1'
+    });
+    const isAllowedRole2 = await Protektor.hasPermission({
+      action: 'write',
+      resource: 'Home',
+      roleName: 'role2'
+    });
+    const isAllowedRole22 = await Protektor.hasPermission({
+      action: 'write',
+      resource: 'Home',
+      roleName: 'role2'
+    });
+    const isForbidden1 = await Protektor.hasPermission({
+      action: 'read',
+      resource: 'Reports',
+      roleName: 'role1'
+    });
+
+    expect(isAllowedRole1).toEqual(true);
+    expect(isAllowedRole2).toEqual(true);
+    expect(isAllowedRole11).toEqual(true);
+    expect(isAllowedRole22).toEqual(true);
+    expect(isForbidden1).toEqual(false);
+  });
+
+  test('forbid permission for second role', async () => {
+    await Protektor.forbid({
+      action: 'read',
+      resource: 'Reports',
+      roleName: 'role2'
+    });
+
+    const isAllowedRole1 = await Protektor.hasPermission({
+      action: 'read',
+      resource: 'Home',
+      roleName: 'role1'
+    });
+    const isAllowedRole11 = await Protektor.hasPermission({
+      action: 'write',
+      resource: 'Home',
+      roleName: 'role1'
+    });
+    const isAllowedRole2 = await Protektor.hasPermission({
+      action: 'write',
+      resource: 'Home',
+      roleName: 'role2'
+    });
+    const isAllowedRole22 = await Protektor.hasPermission({
+      action: 'write',
+      resource: 'Home',
+      roleName: 'role2'
+    });
+    const isForbidden1 = await Protektor.hasPermission({
+      action: 'read',
+      resource: 'Reports',
+      roleName: 'role1'
+    });
+    const isForbidden2 = await Protektor.hasPermission({
+      action: 'read',
+      resource: 'Reports',
+      roleName: 'role2'
+    });
+
+    expect(isAllowedRole1).toEqual(true);
+    expect(isAllowedRole2).toEqual(true);
+    expect(isAllowedRole11).toEqual(true);
+    expect(isAllowedRole22).toEqual(true);
+    expect(isForbidden1).toEqual(false);
+    expect(isForbidden2).toEqual(false);
+  });
+
+  test('forbid second permission for first role', async () => {
+    await Protektor.forbid({
+      action: 'write',
+      resource: 'Reports',
+      roleName: 'role1'
+    });
+
+    const isAllowedRole1 = await Protektor.hasPermission({
+      action: 'read',
+      resource: 'Home',
+      roleName: 'role1'
+    });
+    const isAllowedRole11 = await Protektor.hasPermission({
+      action: 'write',
+      resource: 'Home',
+      roleName: 'role1'
+    });
+    const isAllowedRole2 = await Protektor.hasPermission({
+      action: 'write',
+      resource: 'Home',
+      roleName: 'role2'
+    });
+    const isAllowedRole22 = await Protektor.hasPermission({
+      action: 'write',
+      resource: 'Home',
+      roleName: 'role2'
+    });
+    const isForbidden1 = await Protektor.hasPermission({
+      action: 'read',
+      resource: 'Reports',
+      roleName: 'role1'
+    });
+    const isForbidden2 = await Protektor.hasPermission({
+      action: 'read',
+      resource: 'Reports',
+      roleName: 'role2'
+    });
+    const isForbidden11 = await Protektor.hasPermission({
+      action: 'write',
+      resource: 'Reports',
+      roleName: 'role1'
+    });
+
+    expect(isAllowedRole1).toEqual(true);
+    expect(isAllowedRole2).toEqual(true);
+    expect(isAllowedRole11).toEqual(true);
+    expect(isAllowedRole22).toEqual(true);
+    expect(isForbidden1).toEqual(false);
+    expect(isForbidden2).toEqual(false);
+    expect(isForbidden11).toEqual(false);
+  });
+
+  test('forbid second permission for second role', async () => {
+    await Protektor.forbid({
+      action: 'write',
+      resource: 'Reports',
+      roleName: 'role2'
+    });
+
+    const isAllowedRole1 = await Protektor.hasPermission({
+      action: 'read',
+      resource: 'Home',
+      roleName: 'role1'
+    });
+    const isAllowedRole11 = await Protektor.hasPermission({
+      action: 'write',
+      resource: 'Home',
+      roleName: 'role1'
+    });
+    const isAllowedRole2 = await Protektor.hasPermission({
+      action: 'write',
+      resource: 'Home',
+      roleName: 'role2'
+    });
+    const isAllowedRole22 = await Protektor.hasPermission({
+      action: 'write',
+      resource: 'Home',
+      roleName: 'role2'
+    });
+    const isForbidden1 = await Protektor.hasPermission({
+      action: 'read',
+      resource: 'Reports',
+      roleName: 'role1'
+    });
+    const isForbidden2 = await Protektor.hasPermission({
+      action: 'read',
+      resource: 'Reports',
+      roleName: 'role2'
+    });
+    const isForbidden11 = await Protektor.hasPermission({
+      action: 'write',
+      resource: 'Reports',
+      roleName: 'role1'
+    });
+    const isForbidden22 = await Protektor.hasPermission({
+      action: 'write',
+      resource: 'Reports',
+      roleName: 'role2'
+    });
+
+    expect(isAllowedRole1).toEqual(true);
+    expect(isAllowedRole2).toEqual(true);
+    expect(isAllowedRole11).toEqual(true);
+    expect(isAllowedRole22).toEqual(true);
+    expect(isForbidden1).toEqual(false);
+    expect(isForbidden2).toEqual(false);
+    expect(isForbidden11).toEqual(false);
+    expect(isForbidden22).toEqual(false);
+  });
+
+  test('get all resource names', async () => {
+    const allResourceNames = await Protektor.allResourceNames();
+    expect(allResourceNames).toEqual(['Reports', 'Home']);
+  });
+
+  test('get all roles', async () => {
+    const allRoles = await Protektor.allRoles();
+    expect(allRoles).toEqual([
+      {
+        roleName: 'role1',
+        permissions:
+          [
+            { action: 'read', resource: 'Home', allowed: true },
+            { action: 'write', resource: 'Home', allowed: true },
+            { action: 'read', resource: 'Reports', allowed: false },
+            { action: 'write', resource: 'Reports', allowed: false }
+          ]
+      },
+      {
+        roleName: 'role2',
+        permissions: [
+          { action: 'write', resource: 'Home', allowed: true },
+          { action: 'read', resource: 'Home', allowed: true },
+          { action: 'read', resource: 'Reports', allowed: false },
+          { action: 'write', resource: 'Reports', allowed: false }
+        ]
+      }
+    ]);
   });
 });

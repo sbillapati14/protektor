@@ -79,7 +79,6 @@ class ProtektorMemAdapter {
     );
     const updatedRoles = updateRole(this.db.roles);
     this.db.roles = updatedRoles;
-    console.log('db:', JSON.stringify(this.db));
   }
 
   toJSON = () => clone(this.db);
