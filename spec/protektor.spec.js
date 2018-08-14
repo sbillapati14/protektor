@@ -357,4 +357,10 @@ describe('Protektor with mem adapter', () => {
       }
     ]);
   });
+
+  test('find role based on the name', async () => {
+    const role = await Protektor.roleToJSON('role2');
+
+    console.log(role);
+  });
 });

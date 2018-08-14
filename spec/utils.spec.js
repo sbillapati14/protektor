@@ -1,4 +1,4 @@
-import { getResourceName, getModelName, requiredParam } from '../src/utils';
+import { getResourceName, getModelName } from '../src/utils';
 
 describe('Utils', () => {
   it('invalid resource name', () => {
