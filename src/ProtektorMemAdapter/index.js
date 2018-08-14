@@ -19,30 +19,17 @@ import {
   head,
   lensProp,
   isNil,
-  join,
-  toLower,
-  values
+  equals,
+  path
 } from 'ramda';
 import { RoleNotFoundError } from '../Errors';
 
 class ProtektorMemAdapter {
-  roleIdentifierPredicate;
+  roleIdentifierComparator;
 
   db = {
     resources: [],
     roles: []
-  };
-
-  searchPredicate = () => {
-    if (this.roleIdentifierPredicate) {
-      return this.roleIdentifierPredicate;
-    }
-
-    return compose(
-      join(' '),
-      map(word => toLower(word)),
-      values
-    );
   };
 
   objectToArray = curry(obj => obj ? [obj] : []);
@@ -56,21 +43,35 @@ class ProtektorMemAdapter {
 
   pathToModels = pathOr([], ['models']);
 
-  findRoleInternal = (roleName, roles) => find(propEq('roleName', roleName), roles);
+  // findRoleInternal = (roleName, roles) => find(propEq('roleName', roleName), roles);
+  findRoleInternal = (roleIdentifier, roles) => find(
+    compose(
+      equals(this.roleIdentifierComparator(roleIdentifier)),
+      this.roleIdentifierComparator,
+      path(['roleIdentifier'])
+    ), roles
+  );
 
-  createNewRole = (action, resource, roleName, allowed) => ({
-    roleName, permissions: [{ action, resource, allowed }]
+  createNewRole = (action, resource, roleIdentifier, allowed) => ({
+    roleIdentifier, permissions: [{ action, resource, allowed }]
   });
 
-  insertPermission = (action, resource, roleName, allowed) => {
-    const newRole = this.createNewRole(action, resource, roleName, allowed);
-    const existingRole = curry(roles => find(propEq('roleName', roleName), roles));
+  insertPermission = (action, resource, roleIdentifier, allowed) => {
+    const newRole = this.createNewRole(action, resource, roleIdentifier, allowed);
+    // const existingRole = curry(roles => find(propEq('roleName', roleName), roles));
+    const existingRole = curry(roles => find(
+      compose(
+        equals(this.roleIdentifierComparator(roleIdentifier)),
+        this.roleIdentifierComparator,
+        path(['roleIdentifier'])
+      ), roles
+    ));
     const isNewRole = compose(
       isNil,
       existingRole
     );
     const matchPermissions = curry((toRemove, elem) => (elem.action !== toRemove.action || elem.resource !== toRemove.resource));
-    const matchRole = curry((toRemove, elem) => elem.roleName !== toRemove.roleName);
+    const matchRole = curry((toRemove, elem) => elem.roleIdentifier !== toRemove.roleIdentifier);
     const removeDup = (matcher, toRemove) => filter(matcher(toRemove));
     const mergeObjectToList = (matcher, newObj, list) => compose(
       append(newObj),
@@ -99,6 +100,10 @@ class ProtektorMemAdapter {
   toJSON = () => clone(this.db);
 
   // Interface methods
+  registerRoleIdentifierComparator = (predicate) => {
+    this.roleIdentifierComparator = predicate;
+  }
+
   findDataModels = (resource) => {
     const findResourceModels = compose(
       this.pathToModels,
@@ -122,16 +127,16 @@ class ProtektorMemAdapter {
     return Promise.resolve();
   }
 
-  insertAllow = (action, resourceName, roleName) => this.insertPermission(
-    action, resourceName, roleName, true
+  insertAllow = (action, resourceName, roleIdentifier) => this.insertPermission(
+    action, resourceName, roleIdentifier, true
   );
 
-  insertForbid = (action, resourceName, roleName) => this.insertPermission(
-    action, resourceName, roleName, false
+  insertForbid = (action, resourceName, roleIdentifier) => this.insertPermission(
+    action, resourceName, roleIdentifier, false
   );
 
-  findModel = (modelName, roleName) => {
-    const role = this.findRoleInternal(roleName, this.db.roles);
+  findModel = (modelName, roleIdentifier) => {
+    const role = this.findRoleInternal(roleIdentifier, this.db.roles);
     if (!role) {
       throw new RoleNotFoundError();
     }
@@ -156,8 +161,8 @@ class ProtektorMemAdapter {
     return Promise.resolve(contains(modelName, modelsOwnedByRole(resourcesOwnedByRole)));
   }
 
-  hasPermission = (action, resource, roleName) => {
-    const role = this.findRoleInternal(roleName, this.db.roles);
+  hasPermission = (action, resource, roleIdentifier) => {
+    const role = this.findRoleInternal(roleIdentifier, this.db.roles);
     if (!role) {
       throw new RoleNotFoundError();
     }
@@ -173,7 +178,7 @@ class ProtektorMemAdapter {
 
   findAllRoles = () => Promise.resolve(map(clone, this.db.roles));
 
-  findRole = roleName => Promise.resolve(this.findRoleInternal(roleName, this.db.roles));
+  findRole = roleIdentifier => Promise.resolve(this.findRoleInternal(roleIdentifier, this.db.roles));
 }
 
 export default ProtektorMemAdapter;

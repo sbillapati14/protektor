@@ -40,13 +40,17 @@ describe('Protektor with mem adapter', () => {
     await Protektor.allow({
       action: 'read',
       resource: 'Home',
-      roleName: 'role1'
+      roleIdentifier: {
+        name: 'role1'
+      }
     });
 
     const isAllowed = await Protektor.hasPermission({
       action: 'read',
       resource: 'Home',
-      roleName: 'role1'
+      roleIdentifier: {
+        name: 'role1'
+      }
     });
     expect(isAllowed).toEqual(true);
   });
@@ -55,18 +59,24 @@ describe('Protektor with mem adapter', () => {
     await Protektor.allow({
       action: 'write',
       resource: 'Home',
-      roleName: 'role2'
+      roleIdentifier: {
+        name: 'role2'
+      }
     });
 
     const isAllowedRole1 = await Protektor.hasPermission({
       action: 'read',
       resource: 'Home',
-      roleName: 'role1'
+      roleIdentifier: {
+        name: 'role1'
+      }
     });
     const isAllowedRole2 = await Protektor.hasPermission({
       action: 'write',
       resource: 'Home',
-      roleName: 'role2'
+      roleIdentifier: {
+        name: 'role2'
+      }
     });
     expect(isAllowedRole1).toEqual(true);
     expect(isAllowedRole2).toEqual(true);
@@ -76,23 +86,31 @@ describe('Protektor with mem adapter', () => {
     await Protektor.allow({
       action: 'write',
       resource: 'Home',
-      roleName: 'role1'
+      roleIdentifier: {
+        name: 'role1'
+      }
     });
 
     const isAllowedRole1 = await Protektor.hasPermission({
       action: 'read',
       resource: 'Home',
-      roleName: 'role1'
+      roleIdentifier: {
+        name: 'role1'
+      }
     });
     const isAllowedRole11 = await Protektor.hasPermission({
       action: 'write',
       resource: 'Home',
-      roleName: 'role1'
+      roleIdentifier: {
+        name: 'role1'
+      }
     });
     const isAllowedRole2 = await Protektor.hasPermission({
       action: 'write',
       resource: 'Home',
-      roleName: 'role2'
+      roleIdentifier: {
+        name: 'role2'
+      }
     });
     expect(isAllowedRole1).toEqual(true);
     expect(isAllowedRole2).toEqual(true);
@@ -103,28 +121,38 @@ describe('Protektor with mem adapter', () => {
     await Protektor.allow({
       action: 'read',
       resource: 'Home',
-      roleName: 'role2'
+      roleIdentifier: {
+        name: 'role2'
+      }
     });
 
     const isAllowedRole1 = await Protektor.hasPermission({
       action: 'read',
       resource: 'Home',
-      roleName: 'role1'
+      roleIdentifier: {
+        name: 'role1'
+      }
     });
     const isAllowedRole11 = await Protektor.hasPermission({
       action: 'write',
       resource: 'Home',
-      roleName: 'role1'
+      roleIdentifier: {
+        name: 'role1'
+      }
     });
     const isAllowedRole2 = await Protektor.hasPermission({
       action: 'write',
       resource: 'Home',
-      roleName: 'role2'
+      roleIdentifier: {
+        name: 'role2'
+      }
     });
     const isAllowedRole22 = await Protektor.hasPermission({
       action: 'write',
       resource: 'Home',
-      roleName: 'role2'
+      roleIdentifier: {
+        name: 'role2'
+      }
     });
     expect(isAllowedRole1).toEqual(true);
     expect(isAllowedRole2).toEqual(true);
@@ -136,33 +164,45 @@ describe('Protektor with mem adapter', () => {
     await Protektor.forbid({
       action: 'read',
       resource: 'Reports',
-      roleName: 'role1'
+      roleIdentifier: {
+        name: 'role1'
+      }
     });
 
     const isAllowedRole1 = await Protektor.hasPermission({
       action: 'read',
       resource: 'Home',
-      roleName: 'role1'
+      roleIdentifier: {
+        name: 'role1'
+      }
     });
     const isAllowedRole11 = await Protektor.hasPermission({
       action: 'write',
       resource: 'Home',
-      roleName: 'role1'
+      roleIdentifier: {
+        name: 'role1'
+      }
     });
     const isAllowedRole2 = await Protektor.hasPermission({
       action: 'write',
       resource: 'Home',
-      roleName: 'role2'
+      roleIdentifier: {
+        name: 'role2'
+      }
     });
     const isAllowedRole22 = await Protektor.hasPermission({
       action: 'write',
       resource: 'Home',
-      roleName: 'role2'
+      roleIdentifier: {
+        name: 'role2'
+      }
     });
     const isForbidden1 = await Protektor.hasPermission({
       action: 'read',
       resource: 'Reports',
-      roleName: 'role1'
+      roleIdentifier: {
+        name: 'role1'
+      }
     });
 
     expect(isAllowedRole1).toEqual(true);
@@ -176,38 +216,52 @@ describe('Protektor with mem adapter', () => {
     await Protektor.forbid({
       action: 'read',
       resource: 'Reports',
-      roleName: 'role2'
+      roleIdentifier: {
+        name: 'role2'
+      }
     });
 
     const isAllowedRole1 = await Protektor.hasPermission({
       action: 'read',
       resource: 'Home',
-      roleName: 'role1'
+      roleIdentifier: {
+        name: 'role1'
+      }
     });
     const isAllowedRole11 = await Protektor.hasPermission({
       action: 'write',
       resource: 'Home',
-      roleName: 'role1'
+      roleIdentifier: {
+        name: 'role1'
+      }
     });
     const isAllowedRole2 = await Protektor.hasPermission({
       action: 'write',
       resource: 'Home',
-      roleName: 'role2'
+      roleIdentifier: {
+        name: 'role2'
+      }
     });
     const isAllowedRole22 = await Protektor.hasPermission({
       action: 'write',
       resource: 'Home',
-      roleName: 'role2'
+      roleIdentifier: {
+        name: 'role2'
+      }
     });
     const isForbidden1 = await Protektor.hasPermission({
       action: 'read',
       resource: 'Reports',
-      roleName: 'role1'
+      roleIdentifier: {
+        name: 'role1'
+      }
     });
     const isForbidden2 = await Protektor.hasPermission({
       action: 'read',
       resource: 'Reports',
-      roleName: 'role2'
+      roleIdentifier: {
+        name: 'role2'
+      }
     });
 
     expect(isAllowedRole1).toEqual(true);
@@ -222,43 +276,59 @@ describe('Protektor with mem adapter', () => {
     await Protektor.forbid({
       action: 'write',
       resource: 'Reports',
-      roleName: 'role1'
+      roleIdentifier: {
+        name: 'role1'
+      }
     });
 
     const isAllowedRole1 = await Protektor.hasPermission({
       action: 'read',
       resource: 'Home',
-      roleName: 'role1'
+      roleIdentifier: {
+        name: 'role1'
+      }
     });
     const isAllowedRole11 = await Protektor.hasPermission({
       action: 'write',
       resource: 'Home',
-      roleName: 'role1'
+      roleIdentifier: {
+        name: 'role1'
+      }
     });
     const isAllowedRole2 = await Protektor.hasPermission({
       action: 'write',
       resource: 'Home',
-      roleName: 'role2'
+      roleIdentifier: {
+        name: 'role2'
+      }
     });
     const isAllowedRole22 = await Protektor.hasPermission({
       action: 'write',
       resource: 'Home',
-      roleName: 'role2'
+      roleIdentifier: {
+        name: 'role2'
+      }
     });
     const isForbidden1 = await Protektor.hasPermission({
       action: 'read',
       resource: 'Reports',
-      roleName: 'role1'
+      roleIdentifier: {
+        name: 'role1'
+      }
     });
     const isForbidden2 = await Protektor.hasPermission({
       action: 'read',
       resource: 'Reports',
-      roleName: 'role2'
+      roleIdentifier: {
+        name: 'role2'
+      }
     });
     const isForbidden11 = await Protektor.hasPermission({
       action: 'write',
       resource: 'Reports',
-      roleName: 'role1'
+      roleIdentifier: {
+        name: 'role1'
+      }
     });
 
     expect(isAllowedRole1).toEqual(true);
@@ -274,48 +344,66 @@ describe('Protektor with mem adapter', () => {
     await Protektor.forbid({
       action: 'write',
       resource: 'Reports',
-      roleName: 'role2'
+      roleIdentifier: {
+        name: 'role2'
+      }
     });
 
     const isAllowedRole1 = await Protektor.hasPermission({
       action: 'read',
       resource: 'Home',
-      roleName: 'role1'
+      roleIdentifier: {
+        name: 'role1'
+      }
     });
     const isAllowedRole11 = await Protektor.hasPermission({
       action: 'write',
       resource: 'Home',
-      roleName: 'role1'
+      roleIdentifier: {
+        name: 'role1'
+      }
     });
     const isAllowedRole2 = await Protektor.hasPermission({
       action: 'write',
       resource: 'Home',
-      roleName: 'role2'
+      roleIdentifier: {
+        name: 'role2'
+      }
     });
     const isAllowedRole22 = await Protektor.hasPermission({
       action: 'write',
       resource: 'Home',
-      roleName: 'role2'
+      roleIdentifier: {
+        name: 'role2'
+      }
     });
     const isForbidden1 = await Protektor.hasPermission({
       action: 'read',
       resource: 'Reports',
-      roleName: 'role1'
+      roleIdentifier: {
+        name: 'role1'
+      }
     });
     const isForbidden2 = await Protektor.hasPermission({
       action: 'read',
       resource: 'Reports',
-      roleName: 'role2'
+      roleIdentifier: {
+        name: 'role2'
+      }
     });
     const isForbidden11 = await Protektor.hasPermission({
       action: 'write',
       resource: 'Reports',
-      roleName: 'role1'
+      roleIdentifier: {
+        name: 'role1'
+      }
     });
     const isForbidden22 = await Protektor.hasPermission({
       action: 'write',
       resource: 'Reports',
-      roleName: 'role2'
+      roleIdentifier: {
+        name: 'role2'
+      }
     });
 
     expect(isAllowedRole1).toEqual(true);
@@ -337,29 +425,32 @@ describe('Protektor with mem adapter', () => {
     const allRoles = await Protektor.allRoles();
     expect(allRoles).toEqual([
       {
-        roleName: 'role1',
-        permissions:
-          [
-            { action: 'read', resource: 'Home', allowed: true },
-            { action: 'write', resource: 'Home', allowed: true },
-            { action: 'read', resource: 'Reports', allowed: false },
-            { action: 'write', resource: 'Reports', allowed: false }
-          ]
+        permissions: [
+          { action: 'read', allowed: true, resource: 'Home' },
+          { action: 'write', allowed: true, resource: 'Home' },
+          { action: 'read', allowed: false, resource: 'Reports' },
+          { action: 'write', allowed: false, resource: 'Reports' }
+        ],
+        roleIdentifier: {
+          name: 'role1'
+        }
       },
       {
-        roleName: 'role2',
         permissions: [
-          { action: 'write', resource: 'Home', allowed: true },
-          { action: 'read', resource: 'Home', allowed: true },
-          { action: 'read', resource: 'Reports', allowed: false },
-          { action: 'write', resource: 'Reports', allowed: false }
-        ]
+          { action: 'write', allowed: true, resource: 'Home' },
+          { action: 'read', allowed: true, resource: 'Home' },
+          { action: 'read', allowed: false, resource: 'Reports' },
+          { action: 'write', allowed: false, resource: 'Reports' }
+        ],
+        roleIdentifier: {
+          name: 'role2'
+        }
       }
     ]);
   });
 
   test('find role based on the name', async () => {
-    const role = await Protektor.roleToJSON('role2');
+    const role = await Protektor.roleToJSON({ name: 'role2' });
 
     console.log(role);
   });

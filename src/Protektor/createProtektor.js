@@ -1,3 +1,10 @@
+import {
+  join,
+  map,
+  toLower,
+  values,
+  compose
+} from 'ramda';
 import { InvalidOrMissingAdapterError, InvalidResourceTypeError } from '../Errors';
 import { requiredParam, getResourceName } from '../utils';
 
@@ -14,10 +21,15 @@ const createProtektor = () => {
 
   const registerAdapter = (newAdapter) => {
     adapter = newAdapter;
+    adapter.registerRoleIdentifierComparator(compose(
+      join('-'),
+      map(word => toLower(word)),
+      values
+    ));
   };
 
-  const registeRoleIdentifierPredicate = (predicate) => {
-    adapter.registeRoleIdentifierPredicate(predicate);
+  const registerRoleIdentifierComparator = (predicate) => {
+    adapter.registerRoleIdentifierComparator(predicate);
   };
 
   const resourceModels = (resource, dataModel) => {
@@ -43,34 +55,34 @@ const createProtektor = () => {
   const allow = ({
     action = requiredParam('action'),
     resource = requiredParam('resource'),
-    roleName = requiredParam('roleName')
-  }) => getAdapter().insertAllow(action, getResourceName(resource), roleName);
+    roleIdentifier = requiredParam('roleIdentifier')
+  }) => getAdapter().insertAllow(action, getResourceName(resource), roleIdentifier);
 
   const forbid = ({
     action = requiredParam('action'),
     resource = requiredParam('resource'),
-    roleName = requiredParam('roleName')
-  }) => getAdapter().insertForbid(action, getResourceName(resource), roleName);
+    roleIdentifier = requiredParam('roleIdentifier')
+  }) => getAdapter().insertForbid(action, getResourceName(resource), roleIdentifier);
 
   const hasModel = ({
     modelName = requiredParam('modelName'),
-    roleName = requiredParam('roleName')
-  }) => getAdapter().findModel(modelName, roleName);
+    roleIdentifier = requiredParam('roleIdentifier')
+  }) => getAdapter().findModel(modelName, roleIdentifier);
 
   const getModel = ({
     modelName = requiredParam('modelName'),
-    roleName = requiredParam('roleName'),
+    roleIdentifier = requiredParam('roleIdentifier'),
     modelTransformCallback = requiredParam('modelTransformCallback')
   }) => {
-    const model = getAdapter().findModel(modelName, roleName);
+    const model = getAdapter().findModel(modelName, roleIdentifier);
     return modelTransformCallback(model);
   };
 
   const hasPermission = ({
     action = requiredParam('action'),
     resource = requiredParam('resource'),
-    roleName = requiredParam('roleName')
-  }) => getAdapter().hasPermission(action, resource, roleName);
+    roleIdentifier = requiredParam('roleIdentifier')
+  }) => getAdapter().hasPermission(action, resource, roleIdentifier);
 
   const allResourceNames = () => getAdapter().findAllResourceNames();
 
@@ -80,7 +92,7 @@ const createProtektor = () => {
 
   return Object.freeze({
     registerAdapter,
-    registeRoleIdentifierPredicate,
+    registerRoleIdentifierComparator,
     resourceModels,
     allow,
     forbid,
