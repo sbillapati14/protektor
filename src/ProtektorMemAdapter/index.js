@@ -18,14 +18,31 @@ import {
   filter,
   head,
   lensProp,
-  isNil
+  isNil,
+  join,
+  toLower,
+  values
 } from 'ramda';
 import { RoleNotFoundError } from '../Errors';
 
 class ProtektorMemAdapter {
+  roleIdentifierPredicate;
+
   db = {
     resources: [],
     roles: []
+  };
+
+  searchPredicate = () => {
+    if (this.roleIdentifierPredicate) {
+      return this.roleIdentifierPredicate;
+    }
+
+    return compose(
+      join(' '),
+      map(word => toLower(word)),
+      values
+    );
   };
 
   objectToArray = curry(obj => obj ? [obj] : []);
@@ -37,9 +54,7 @@ class ProtektorMemAdapter {
     this.matchResource,
   ));
 
-  pathToModels = pathOr([], ['models'])
-
-  matchRole = propEq('roleName');
+  pathToModels = pathOr([], ['models']);
 
   findRoleInternal = (roleName, roles) => find(propEq('roleName', roleName), roles);
 

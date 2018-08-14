@@ -16,6 +16,10 @@ const createProtektor = () => {
     adapter = newAdapter;
   };
 
+  const registeRoleIdentifierPredicate = (predicate) => {
+    adapter.registeRoleIdentifierPredicate(predicate);
+  };
+
   const resourceModels = (resource, dataModel) => {
     const adapt = getAdapter();
 
@@ -76,6 +80,7 @@ const createProtektor = () => {
 
   return Object.freeze({
     registerAdapter,
+    registeRoleIdentifierPredicate,
     resourceModels,
     allow,
     forbid,
