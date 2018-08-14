@@ -59,7 +59,7 @@ Upon creation of each team the default admin role could be assigned:
 
 Protektor needs to be able to search for the role identifier but it does not know what fields
 or combination of fields within role identifier makes it unique search criteria.  In order
-to provide Protektor with this information you mush register predicate that returns unique
+to provide Protektor with this information you must register predicate that returns unique
 identity for the role.  The predicate is a function with that takes role identifier object
 and returns unique id based on whatever algorithm you choose.  
 
@@ -70,7 +70,13 @@ fields:
 function roleId(roleIdentifier) {
   return slug(roleIdentifier.name + ' ' + roleIdentifier.group);
 }
+
+Protektor.registerRoleIdentifierPredicate(roleId)
 ```
+
+Note that if you do not register role identifier predicate Protektor will scan role identifier
+object and concatinate values of object's all top level keys.  Depending on your application
+this may be sufficient for you needs.
 
 # Define Permissions
 To define access permissions within a `role` specify allowed action on the resource:
