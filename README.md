@@ -95,7 +95,7 @@ Protektor.removePermission({ action, resource, roleIdentifier })
 
 It is possible to call allow and then forbid on the same resource, action, role.  The last call will overwrite permissions.
 
-# Checking Permissions on Server
+# Checking Permissions On The Server
 Protektor library supports checking permissions for the given role on the server side via `hasPermission` API:
 
 ```
@@ -120,7 +120,65 @@ Protektor.getModel({ modelName, roleIdentifier, modelTransformCallback })
 
 modelTransformCallback is a function that is called with modelName as parameter if the access to model is permitted or undefined if not permitted.
 
-# Marshalling Role to the client
+# Searching For Roles On The Server
+Protektor provides two APIs to search for roles.  One to find a specific Role and second one to filter
+out roles based on some criteria.
+
+To find specific role call `Protektor.roleToJSON(RoleIdentifier)`.  This will return role as JSON object
+that is ready to be marshalled to the client.
+
+To find roles based on some criteria use `Protektor.filterRoles(filterComparator, roleIdentifier)`.
+This function will return all roles that match criteria based on the `filterComparator` and value
+provided in `roleIdentifier` object.
+
+For example let's assume you have roles defined like this:
+
+```
+[
+  {
+    name: 'role1'
+  },
+  {
+    name: 'role2'
+  },
+  {
+    name: 'role1',
+    group: 'global'
+  },
+  {
+    name: 'role2',
+    group: 'global'
+  }
+]
+```
+
+and you want to just get the roles that belong to global group.  You would call `filterRoles` as follows:
+
+```
+const globalRoles = await Protektor.filterRoles(
+  roleIdentifier => roleIdentifier.group,
+  {
+    group: 'global'
+  }
+);
+```
+
+This would return only roles with group global:
+
+```
+[
+  {
+    name: 'role1',
+    group: 'global'
+  },
+  {
+    name: 'role2',
+    group: 'global'
+  }
+]
+```
+
+# Marshalling Role To The Client
 To send a role with its permissions to the client call server side API: `Protektor.roleToJSON(roleIdentifier)`.
 
 # Checking Permissions - ReactJS Client

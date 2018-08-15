@@ -43,11 +43,18 @@ class ProtektorMemAdapter {
 
   pathToModels = pathOr([], ['models']);
 
-  // findRoleInternal = (roleName, roles) => find(propEq('roleName', roleName), roles);
   findRoleInternal = (roleIdentifier, roles) => find(
     compose(
       equals(this.roleIdentifierComparator(roleIdentifier)),
       this.roleIdentifierComparator,
+      path(['roleIdentifier'])
+    ), roles
+  );
+
+  filterRoleInternal = (filterComparator, roleIdentifier, roles) => filter(
+    compose(
+      equals(filterComparator(roleIdentifier)),
+      filterComparator,
       path(['roleIdentifier'])
     ), roles
   );
@@ -58,7 +65,6 @@ class ProtektorMemAdapter {
 
   insertPermission = (action, resource, roleIdentifier, allowed) => {
     const newRole = this.createNewRole(action, resource, roleIdentifier, allowed);
-    // const existingRole = curry(roles => find(propEq('roleName', roleName), roles));
     const existingRole = curry(roles => find(
       compose(
         equals(this.roleIdentifierComparator(roleIdentifier)),
@@ -176,7 +182,9 @@ class ProtektorMemAdapter {
 
   findAllResourceNames = () => Promise.resolve(map(pathOr([], ['resourceName']), this.db.resources));
 
-  findAllRoles = () => Promise.resolve(map(clone, this.db.roles));
+  filterRoles = (filterComparator, roleIdentifier) => Promise.resolve(
+    this.filterRoleInternal(filterComparator, roleIdentifier, this.db.roles)
+  );
 
   findRole = roleIdentifier => Promise.resolve(this.findRoleInternal(roleIdentifier, this.db.roles));
 }

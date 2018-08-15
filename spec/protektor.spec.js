@@ -421,37 +421,198 @@ describe('Protektor with mem adapter', () => {
     expect(allResourceNames).toEqual(['Reports', 'Home']);
   });
 
-  test('get all roles', async () => {
-    const allRoles = await Protektor.allRoles();
-    expect(allRoles).toEqual([
-      {
-        permissions: [
-          { action: 'read', allowed: true, resource: 'Home' },
-          { action: 'write', allowed: true, resource: 'Home' },
-          { action: 'read', allowed: false, resource: 'Reports' },
-          { action: 'write', allowed: false, resource: 'Reports' }
-        ],
-        roleIdentifier: {
-          name: 'role1'
-        }
-      },
-      {
-        permissions: [
-          { action: 'write', allowed: true, resource: 'Home' },
-          { action: 'read', allowed: true, resource: 'Home' },
-          { action: 'read', allowed: false, resource: 'Reports' },
-          { action: 'write', allowed: false, resource: 'Reports' }
-        ],
-        roleIdentifier: {
-          name: 'role2'
-        }
+  test('allow permission for first role with group', async () => {
+    await Protektor.allow({
+      action: 'update',
+      resource: 'Home',
+      roleIdentifier: {
+        name: 'role1',
+        group: 'global'
       }
-    ]);
+    });
+
+    const isAllowedGlobal = await Protektor.hasPermission({
+      action: 'update',
+      resource: 'Home',
+      roleIdentifier: {
+        name: 'role1',
+        group: 'global'
+      }
+    });
+    expect(isAllowedGlobal).toEqual(true);
+  });
+
+  test('verify that role without the group cannot access resource', async () => {
+    const isAllowed = await Protektor.hasPermission({
+      action: 'update',
+      resource: 'Home',
+      roleIdentifier: {
+        name: 'role1'
+      }
+    });
+    expect(isAllowed).toEqual(false);
+  });
+
+  test('allow permission for second role with group', async () => {
+    await Protektor.allow({
+      action: 'update',
+      resource: 'Home',
+      roleIdentifier: {
+        name: 'role2',
+        group: 'global'
+      }
+    });
+
+    const isAllowedGlobal1 = await Protektor.hasPermission({
+      action: 'update',
+      resource: 'Home',
+      roleIdentifier: {
+        name: 'role1',
+        group: 'global'
+      }
+    });
+    const isAllowedGlobal2 = await Protektor.hasPermission({
+      action: 'update',
+      resource: 'Home',
+      roleIdentifier: {
+        name: 'role1',
+        group: 'global'
+      }
+    });
+    expect(isAllowedGlobal1).toEqual(true);
+    expect(isAllowedGlobal2).toEqual(true);
+  });
+
+  test('allow second permission for first role with group', async () => {
+    await Protektor.allow({
+      action: 'update',
+      resource: 'Reports',
+      roleIdentifier: {
+        name: 'role1',
+        group: 'global'
+      }
+    });
+
+    const isAllowedGlobal1 = await Protektor.hasPermission({
+      action: 'update',
+      resource: 'Home',
+      roleIdentifier: {
+        name: 'role1',
+        group: 'global'
+      }
+    });
+    const isAllowedGlobal2 = await Protektor.hasPermission({
+      action: 'update',
+      resource: 'Home',
+      roleIdentifier: {
+        name: 'role1',
+        group: 'global'
+      }
+    });
+    const isAllowedGlobal11 = await Protektor.hasPermission({
+      action: 'update',
+      resource: 'Reports',
+      roleIdentifier: {
+        name: 'role1',
+        group: 'global'
+      }
+    });
+    expect(isAllowedGlobal1).toEqual(true);
+    expect(isAllowedGlobal2).toEqual(true);
+    expect(isAllowedGlobal11).toEqual(true);
+  });
+
+  test('allow second permission for second role with group', async () => {
+    await Protektor.allow({
+      action: 'update',
+      resource: 'Reports',
+      roleIdentifier: {
+        name: 'role2',
+        group: 'global'
+      }
+    });
+
+    const isAllowedGlobal1 = await Protektor.hasPermission({
+      action: 'update',
+      resource: 'Home',
+      roleIdentifier: {
+        name: 'role1',
+        group: 'global'
+      }
+    });
+    const isAllowedGlobal2 = await Protektor.hasPermission({
+      action: 'update',
+      resource: 'Home',
+      roleIdentifier: {
+        name: 'role1',
+        group: 'global'
+      }
+    });
+    const isAllowedGlobal11 = await Protektor.hasPermission({
+      action: 'update',
+      resource: 'Reports',
+      roleIdentifier: {
+        name: 'role1',
+        group: 'global'
+      }
+    });
+    const isAllowedGlobal21 = await Protektor.hasPermission({
+      action: 'update',
+      resource: 'Reports',
+      roleIdentifier: {
+        name: 'role1',
+        group: 'global'
+      }
+    });
+    expect(isAllowedGlobal1).toEqual(true);
+    expect(isAllowedGlobal2).toEqual(true);
+    expect(isAllowedGlobal11).toEqual(true);
+    expect(isAllowedGlobal21).toEqual(true);
+  });
+
+  test('filter all roles with global group', async () => {
+    const globalRoles = await Protektor.filterRoles(
+      roleIdentifier => roleIdentifier.group,
+      {
+        group: 'global'
+      }
+    );
+
+    expect(globalRoles).toEqual(
+      [
+        {
+          roleIdentifier:
+            { name: 'role1', group: 'global' },
+          permissions: [
+            { action: 'update', resource: 'Home', allowed: true },
+            { action: 'update', resource: 'Reports', allowed: true }
+          ]
+        },
+        {
+          roleIdentifier: { name: 'role2', group: 'global' },
+          permissions: [
+            { action: 'update', resource: 'Home', allowed: true },
+            { action: 'update', resource: 'Reports', allowed: true }
+          ]
+        }
+      ]
+    );
   });
 
   test('find role based on the name', async () => {
     const role = await Protektor.roleToJSON({ name: 'role2' });
 
-    console.log(role);
+    expect(role).toEqual(
+      {
+        roleIdentifier: { name: 'role2' },
+        permissions:
+          [
+            { action: 'write', resource: 'Home', allowed: true },
+            { action: 'read', resource: 'Home', allowed: true },
+            { action: 'read', resource: 'Reports', allowed: false },
+            { action: 'write', resource: 'Reports', allowed: false }
+          ]
+      }
+    );
   });
 });

@@ -86,9 +86,9 @@ const createProtektor = () => {
 
   const allResourceNames = () => getAdapter().findAllResourceNames();
 
-  const allRoles = () => getAdapter().findAllRoles();
+  const filterRoles = (filterComparator, roleIdentifier) => getAdapter().filterRoles(filterComparator, roleIdentifier);
 
-  const roleToJSON = roleName => getAdapter().findRole(roleName);
+  const roleToJSON = roleIdentifier => getAdapter().findRole(roleIdentifier);
 
   return Object.freeze({
     registerAdapter,
@@ -100,7 +100,7 @@ const createProtektor = () => {
     getModel,
     hasPermission,
     allResourceNames,
-    allRoles,
+    filterRoles,
     roleToJSON
   });
 };
