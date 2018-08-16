@@ -211,9 +211,8 @@ from the server.  RoleBuilder returns client side representation of role describ
 Client Role object is representation of the role defined on the server and it is used with all client APIs.  It has the following APIs:
 
 ```
-* roleIdentifier - returns RoleIdentifier object as defined by developer
-* allowed(resource) - list of actions allowed
-* forbidden(resource) - list of actions forbidden
+* roleIdentifier() - returns RoleIdentifier object as defined by developer
+* hasPermission = ({ action, resource }) - returns true if action is allowed on resource, otherwise false
 ```
 
 # Protektor Storage
