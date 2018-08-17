@@ -1,12 +1,14 @@
-const createRoles = require('./Roles');
-const createMemstore = require('./Store/MemStore');
-const { Role, Permission } = require('./ClientRole');
-const { HasPermission } = require('./React/HasPermission');
+import Protektor from './Protektor/index';
+import ProtektorMemAdapter from './ProtektorMemAdapter';
+import { HasPermission } from './React/HasPermission';
+import createRole from './Role';
+import RoleBuilder from './RoleBuilder';
 
-module.exports = {
-  Roles: createRoles(),
-  createMemstore,
-  Role,
-  Permission,
-  HasPermission
+export {
+  ProtektorMemAdapter,
+  HasPermission,
+  createRole,
+  RoleBuilder
 };
+
+export default Protektor;
