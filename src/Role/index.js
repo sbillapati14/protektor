@@ -1,4 +1,9 @@
-import { contains, clone } from 'ramda';
+import {
+  find,
+  where,
+  clone,
+  equals
+} from 'ramda';
 import { InvalidPayloadTypeError } from '../Errors';
 import { requiredParam } from '../utils';
 
@@ -21,11 +26,18 @@ const createRole = (roleData) => {
   const hasPermission = ({
     action = requiredParam('action'),
     resource = requiredParam('resource')
-  }) => contains({ action, resource, allowed: true }, payload.permissions);
+  }) => !!find(where({
+    action: equals(action),
+    resource: equals(resource),
+    allowed: equals(true)
+  }), payload.permissions);
+
+  const toJSON = () => clone(payload);
 
   return Object.freeze({
     roleIdentifier,
-    hasPermission
+    hasPermission,
+    toJSON
   });
 };
 
