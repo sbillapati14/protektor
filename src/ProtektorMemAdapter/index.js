@@ -161,6 +161,16 @@ class ProtektorMemAdapter {
     return Promise.resolve();
   }
 
+  removeRole = (roleIdentifier) => {
+    const role = this.findRoleInternal(roleIdentifier, this.db.roles);
+    if (!role) {
+      throw new RoleNotFoundError();
+    }
+
+    this.db.roles = without([role], this.db.roles);
+    return Promise.resolve();
+  }
+
   hasModel = (modelName, roleIdentifier) => {
     const role = this.findRoleInternal(roleIdentifier, this.db.roles);
     if (!role) {

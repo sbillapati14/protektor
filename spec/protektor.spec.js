@@ -660,4 +660,10 @@ describe('Protektor with mem adapter', () => {
       modelTransformCallback: callback
     });
   });
+
+  test('Remove role', async () => {
+    await Protektor.removeRole({ name: 'role2' });
+    const role = await Protektor.roleToJSON({ name: 'role2' });
+    expect(role).toBeUndefined();
+  });
 });
