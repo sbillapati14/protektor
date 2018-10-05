@@ -95,6 +95,13 @@ Protektor.removePermission({ action, resource, roleIdentifier })
 
 It is possible to call allow and then forbid on the same resource, action, role.  The last call will overwrite permissions.
 
+# Remove Role
+To remove entire role use `removeRole` API:
+
+```
+Protektor.removeRole(roleIdentifier)
+```
+
 # Checking Permissions On The Server
 Protektor library supports checking permissions for the given role on the server side via `hasPermission` API:
 
