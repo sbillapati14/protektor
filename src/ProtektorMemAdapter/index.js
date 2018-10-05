@@ -20,7 +20,9 @@ import {
   lensProp,
   isNil,
   equals,
-  path
+  path,
+  prop,
+  allPass
 } from 'ramda';
 import { RoleNotFoundError } from '../Errors';
 
@@ -141,7 +143,25 @@ class ProtektorMemAdapter {
     action, resourceName, roleIdentifier, false
   );
 
-  findModel = (modelName, roleIdentifier) => {
+  removePermission = (action, resource, roleIdentifier) => {
+    const role = this.findRoleInternal(roleIdentifier, this.db.roles);
+    if (!role) {
+      throw new RoleNotFoundError();
+    }
+
+    const rolePermissions = prop('permissions', role);
+    const matchActionAndResource = allPass([
+      propEq('action', action),
+      propEq('resource', resource)
+    ]);
+
+    const permissionToRemove = find(matchActionAndResource, rolePermissions);
+    const newPermissions = without([permissionToRemove], rolePermissions);
+    role.permissions = newPermissions;
+    return Promise.resolve();
+  }
+
+  hasModel = (modelName, roleIdentifier) => {
     const role = this.findRoleInternal(roleIdentifier, this.db.roles);
     if (!role) {
       throw new RoleNotFoundError();
@@ -165,6 +185,36 @@ class ProtektorMemAdapter {
     );
 
     return Promise.resolve(contains(modelName, modelsOwnedByRole(resourcesOwnedByRole)));
+  }
+
+  findModel = (modelName, roleIdentifier) => {
+    const role = this.findRoleInternal(roleIdentifier, this.db.roles);
+    if (!role) {
+      throw new RoleNotFoundError();
+    }
+
+    const permissions = pathOr([], ['permissions'], role);
+    const listOfResources = map(pathOr([], ['resource']));
+    const uniqueResources = compose(
+      uniq,
+      listOfResources
+    );
+    const resourcesOwnedByRole = uniqueResources(permissions);
+    const modelsOwnedByResources = innerJoin(
+      (resource, resourceName) => resource.resourceName === resourceName,
+      this.db.resources
+    );
+    const modelsOwnedByRole = compose(
+      flatten,
+      map(pathOr([], ['models'])),
+      modelsOwnedByResources
+    );
+
+    if (contains(modelName, modelsOwnedByRole(resourcesOwnedByRole))) {
+      return Promise.resolve(modelName);
+    }
+
+    return Promise.resolve();
   }
 
   hasPermission = (action, resource, roleIdentifier) => {

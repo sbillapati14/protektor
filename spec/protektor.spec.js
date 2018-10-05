@@ -615,4 +615,49 @@ describe('Protektor with mem adapter', () => {
       }
     );
   });
+
+  test('remove permission from role', async () => {
+    await Protektor.removePermission({ action: 'read', resource: 'Reports', roleIdentifier: { name: 'role2' } });
+    const role = await Protektor.roleToJSON({ name: 'role2' });
+
+    expect(role).toEqual(
+      {
+        roleIdentifier: { name: 'role2' },
+        permissions:
+          [
+            { action: 'write', resource: 'Home', allowed: true },
+            { action: 'read', resource: 'Home', allowed: true },
+            { action: 'write', resource: 'Reports', allowed: false }
+          ]
+      }
+    );
+  });
+
+  test('check if role has specified model', async () => {
+    const doesHaveModel = await Protektor.hasModel({ modelName: 'home', roleIdentifier: { name: 'role2' } });
+    expect(doesHaveModel).toBeTruthy();
+  });
+
+  test('check if role has specified model for model that does not exist', async () => {
+    const doesHaveModel = await Protektor.hasModel({ modelName: 'homer', roleIdentifier: { name: 'role2' } });
+    expect(doesHaveModel).toBeFalsy();
+  });
+
+  test('getModel API with model that belongs to a role', async () => {
+    const callback = model => expect(model).toEqual('home');
+    await Protektor.getModel({
+      modelName: 'home',
+      roleIdentifier: { name: 'role2' },
+      modelTransformCallback: callback
+    });
+  });
+
+  test('getModel API with model that does not belong to a role', async () => {
+    const callback = modelName => expect(modelName).toBeUndefined();
+    await Protektor.getModel({
+      modelName: 'homer',
+      roleIdentifier: { name: 'role2' },
+      modelTransformCallback: callback
+    });
+  });
 });
