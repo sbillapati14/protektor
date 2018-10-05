@@ -64,6 +64,12 @@ const createProtektor = () => {
     roleIdentifier = requiredParam('roleIdentifier')
   }) => getAdapter().insertForbid(action, getResourceName(resource), roleIdentifier);
 
+  const removePermission = ({
+    action = requiredParam('action'),
+    resource = requiredParam('resource'),
+    roleIdentifier = requiredParam('roleIdentifier')
+  }) => getAdapter().removePermission(action, getResourceName(resource), roleIdentifier);
+
   const hasModel = ({
     modelName = requiredParam('modelName'),
     roleIdentifier = requiredParam('roleIdentifier')
@@ -96,6 +102,7 @@ const createProtektor = () => {
     resourceModels,
     allow,
     forbid,
+    removePermission,
     hasModel,
     getModel,
     hasPermission,

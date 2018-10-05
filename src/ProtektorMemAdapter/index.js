@@ -20,7 +20,9 @@ import {
   lensProp,
   isNil,
   equals,
-  path
+  path,
+  prop,
+  allPass
 } from 'ramda';
 import { RoleNotFoundError } from '../Errors';
 
@@ -140,6 +142,24 @@ class ProtektorMemAdapter {
   insertForbid = (action, resourceName, roleIdentifier) => this.insertPermission(
     action, resourceName, roleIdentifier, false
   );
+
+  removePermission = (action, resource, roleIdentifier) => {
+    const role = this.findRoleInternal(roleIdentifier, this.db.roles);
+    if (!role) {
+      throw new RoleNotFoundError();
+    }
+
+    const rolePermissions = prop('permissions', role);
+    const matchActionAndResource = allPass([
+      propEq('action', action),
+      propEq('resource', resource)
+    ]);
+
+    const permissionToRemove = find(matchActionAndResource, rolePermissions);
+    const newPermissions = without([permissionToRemove], rolePermissions);
+    role.permissions = newPermissions;
+    return Promise.resolve();
+  }
 
   findModel = (modelName, roleIdentifier) => {
     const role = this.findRoleInternal(roleIdentifier, this.db.roles);
