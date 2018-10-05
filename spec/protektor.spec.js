@@ -615,4 +615,21 @@ describe('Protektor with mem adapter', () => {
       }
     );
   });
+
+  test('remove permission from role', async () => {
+    await Protektor.removePermission({ action: 'read', resource: 'Reports', roleIdentifier: { name: 'role2' } });
+    const role = await Protektor.roleToJSON({ name: 'role2' });
+
+    expect(role).toEqual(
+      {
+        roleIdentifier: { name: 'role2' },
+        permissions:
+          [
+            { action: 'write', resource: 'Home', allowed: true },
+            { action: 'read', resource: 'Home', allowed: true },
+            { action: 'write', resource: 'Reports', allowed: false }
+          ]
+      }
+    );
+  });
 });
