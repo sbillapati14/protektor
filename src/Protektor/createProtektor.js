@@ -73,15 +73,16 @@ const createProtektor = () => {
   const hasModel = ({
     modelName = requiredParam('modelName'),
     roleIdentifier = requiredParam('roleIdentifier')
-  }) => getAdapter().findModel(modelName, roleIdentifier);
+  }) => getAdapter().hasModel(modelName, roleIdentifier);
 
-  const getModel = ({
+  const getModel = async ({
     modelName = requiredParam('modelName'),
     roleIdentifier = requiredParam('roleIdentifier'),
     modelTransformCallback = requiredParam('modelTransformCallback')
   }) => {
-    const model = getAdapter().findModel(modelName, roleIdentifier);
-    return modelTransformCallback(model);
+    const model = await getAdapter().findModel(modelName, roleIdentifier);
+    modelTransformCallback(model);
+    return Promise.resolve();
   };
 
   const hasPermission = ({

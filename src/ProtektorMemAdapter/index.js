@@ -161,7 +161,7 @@ class ProtektorMemAdapter {
     return Promise.resolve();
   }
 
-  findModel = (modelName, roleIdentifier) => {
+  hasModel = (modelName, roleIdentifier) => {
     const role = this.findRoleInternal(roleIdentifier, this.db.roles);
     if (!role) {
       throw new RoleNotFoundError();
@@ -185,6 +185,36 @@ class ProtektorMemAdapter {
     );
 
     return Promise.resolve(contains(modelName, modelsOwnedByRole(resourcesOwnedByRole)));
+  }
+
+  findModel = (modelName, roleIdentifier) => {
+    const role = this.findRoleInternal(roleIdentifier, this.db.roles);
+    if (!role) {
+      throw new RoleNotFoundError();
+    }
+
+    const permissions = pathOr([], ['permissions'], role);
+    const listOfResources = map(pathOr([], ['resource']));
+    const uniqueResources = compose(
+      uniq,
+      listOfResources
+    );
+    const resourcesOwnedByRole = uniqueResources(permissions);
+    const modelsOwnedByResources = innerJoin(
+      (resource, resourceName) => resource.resourceName === resourceName,
+      this.db.resources
+    );
+    const modelsOwnedByRole = compose(
+      flatten,
+      map(pathOr([], ['models'])),
+      modelsOwnedByResources
+    );
+
+    if (contains(modelName, modelsOwnedByRole(resourcesOwnedByRole))) {
+      return Promise.resolve(modelName);
+    }
+
+    return Promise.resolve();
   }
 
   hasPermission = (action, resource, roleIdentifier) => {

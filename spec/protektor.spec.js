@@ -642,4 +642,22 @@ describe('Protektor with mem adapter', () => {
     const doesHaveModel = await Protektor.hasModel({ modelName: 'homer', roleIdentifier: { name: 'role2' } });
     expect(doesHaveModel).toBeFalsy();
   });
+
+  test('getModel API with model that belongs to a role', async () => {
+    const callback = model => expect(model).toEqual('home');
+    await Protektor.getModel({
+      modelName: 'home',
+      roleIdentifier: { name: 'role2' },
+      modelTransformCallback: callback
+    });
+  });
+
+  test('getModel API with model that does not belong to a role', async () => {
+    const callback = modelName => expect(modelName).toBeUndefined();
+    await Protektor.getModel({
+      modelName: 'homer',
+      roleIdentifier: { name: 'role2' },
+      modelTransformCallback: callback
+    });
+  });
 });
