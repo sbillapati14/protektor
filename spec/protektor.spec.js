@@ -632,4 +632,14 @@ describe('Protektor with mem adapter', () => {
       }
     );
   });
+
+  test('check if role has specified model', async () => {
+    const doesHaveModel = await Protektor.hasModel({ modelName: 'home', roleIdentifier: { name: 'role2' } });
+    expect(doesHaveModel).toBeTruthy();
+  });
+
+  test('check if role has specified model for model that does not exist', async () => {
+    const doesHaveModel = await Protektor.hasModel({ modelName: 'homer', roleIdentifier: { name: 'role2' } });
+    expect(doesHaveModel).toBeFalsy();
+  });
 });
