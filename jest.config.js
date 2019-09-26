@@ -6,10 +6,10 @@ module.exports = {
   collectCoverageFrom: ['<rootDir>/src/**/*.{js,jsx}'],
   coverageThreshold: {
     global: {
-      statements: 85,
-      branches: 62,
-      functions: 90,
-      lines: 84
+      statements: 75,
+      branches: 32,
+      functions: 75,
+      lines: 75
     }
   },
   testMatch: ['<rootDir>/spec/*.spec.js'],

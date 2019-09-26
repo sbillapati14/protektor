@@ -1,6 +1,6 @@
 {
-  "name": "@iris-platform/protektor",
-  "version": "0.0.3",
+  "name": "@555platform/protektor",
+  "version": "0.0.4",
   "description": "",
   "main": "dist/index.js",
   "scripts": {
@@ -25,12 +25,12 @@
   "author": "Rob Sliwa",
   "repository": {
     "type": "git",
-    "url": "https://github.com/iris-platform/protektor"
+    "url": "https://github.com/555platform/protektor"
   },
   "bugs": {
-    "url": "https://github.com/iris-platform/protektor/issues"
+    "url": "https://github.com/555platform/protektor/issues"
   },
-  "homepage": "https://github.com/iris-platform/protektor/blob/master/README.md",
+  "homepage": "https://github.com/555platform/protektor/blob/master/README.md",
   "license": "MIT",
   "devDependencies": {
     "babel-cli": "^6.26.0",
